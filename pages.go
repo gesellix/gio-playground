@@ -6,6 +6,8 @@ import (
 	"image/color"
 	"io"
 	"os"
+	"slices"
+	"strings"
 	"time"
 
 	"gioui.org/layout"
@@ -72,7 +74,7 @@ type scenePage struct {
 	disconnect widget.Clickable
 }
 
-func (*scenePage) title() string { return "iOS: scenes and URLs" }
+func (*scenePage) title() string { return "URLs and iOS scenes" }
 func (*scenePage) about() string {
 	return "Gio: the UIScene life cycle on iOS (Gio series 3/4); gogio -plist for the scene manifest"
 }
@@ -84,6 +86,9 @@ func (p *scenePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	}
 	rows := []layout.Widget{
 		u.text(fmt.Sprintf("Open %s://hello in Safari or Notes, once while the app runs and once after closing it in the app switcher (a cold start). The log shows a URLEvent each time.", urlScheme)),
+	}
+	if !registersScheme() {
+		rows = append(rows, u.text(fmt.Sprintf("This build registers no URL scheme: a program started with go run or scripts/desktop.sh is no app bundle, so the system knows no app for %s:// URLs. Build an app with scripts/macos.sh, scripts/android.sh or scripts/ios.sh.", urlScheme)))
 	}
 	if canDisconnectScene {
 		rows = append(rows,
@@ -272,4 +277,10 @@ func (p *logPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		rows = append(rows, u.mono(e))
 	}
 	return rows
+}
+
+// registersScheme reports whether the build registered urlScheme (gogio
+// -schemes), which the scripts note in buildFlags.
+func registersScheme() bool {
+	return slices.Contains(strings.Split(buildFlags, ","), "schemes")
 }

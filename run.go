@@ -50,6 +50,9 @@ var (
 // Run runs the program; it must be called from main and never returns.
 func Run(f Features) {
 	events.add("process started (Gio: " + f.Name + ", gogio flags: " + buildFlags + ")")
+	if !registersScheme() {
+		events.add("no URL scheme registered: started without an app bundle (go run), see the page URLs and iOS scenes")
+	}
 	initPlatform()
 	go func() {
 		w := new(app.Window)
