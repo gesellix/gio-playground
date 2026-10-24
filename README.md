@@ -30,7 +30,8 @@ off the app's backup (`adb shell dumpsys package <APP_ID>`: no
 Where the patches are:
 
 - Gio: [gesellix/gio-forked](https://github.com/gesellix/gio-forked),
-  not sent yet.
+  sent as [gio-patches 72110](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72110)
+  (branch upstream-series); Editor.Wipe is not sent yet.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as

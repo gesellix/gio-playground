@@ -28,9 +28,10 @@ require (
 
 replace github.com/gesellix/gio-playground => ../
 
-// gioui.org: upstream main c2a339fa (2026-10-22) plus the Gio patches, the
-// fork's branch pwdmgr (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261023201852-810e9b2bef88
+// gioui.org: upstream main c2a339fa (2026-10-22) plus the Gio patches as
+// sent upstream (gio-patches 72110) and Editor.Wipe on top, the fork's
+// branch pwdmgr (github.com/gesellix/gio-forked).
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261024180402-a4e76a086475
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).
