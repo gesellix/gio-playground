@@ -60,7 +60,8 @@ cp .env-example .env   # then fill in .env, it stays out of git
 ## Running
 
 ```sh
-scripts/desktop.sh                 # this computer
+scripts/desktop.sh                 # this computer, without an app bundle
+scripts/macos.sh                   # macOS: build the .app and open it
 scripts/android.sh                 # build, install (keeps data), start
 scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
@@ -70,6 +71,10 @@ GIO=upstream scripts/android.sh    # the same without the patches
 Each script lists its commands at the top (`build`, `run`, `uninstall`,
 ...). Variables from the environment win over `.env`. Both builds use the
 same app id, so installing one replaces the other.
+
+URLs need an app that registers the scheme: on the desktop that is only
+the macOS bundle of `scripts/macos.sh` (`open gioplayground://hello`),
+not `scripts/desktop.sh`.
 
 ## iOS signing
 
