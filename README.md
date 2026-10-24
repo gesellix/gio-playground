@@ -52,7 +52,7 @@ Where the patches are:
 
 - Go 1.27.3 or later (the go line of the go.mod files).
 - Android: the Android SDK with the NDK (`ANDROID_HOME`) and `adb`.
-- iOS: a Mac with Xcode (see below for the signing).
+- iOS: a Mac with Xcode and an Apple account (see [iOS setup](#ios-setup)).
 
 ```sh
 cp .env-example .env   # then fill in .env, it stays out of git
@@ -77,23 +77,139 @@ URLs need an app that registers the scheme: on the desktop that is only
 the macOS bundle of `scripts/macos.sh` (`open gioplayground://hello`),
 not `scripts/desktop.sh`.
 
-## iOS signing
+## iOS setup
 
-A free Apple account (Personal Team) is enough for a device of your own;
-such a profile lasts 7 days.
+Xcode has to be installed: gogio takes the iOS SDK, clang, `actool` and
+`lipo` from it, and the scripts install and start the app with
+`devicectl`. Its user interface is needed only for a few steps, marked
+"(Xcode UI)" below.
 
-1. Xcode, Settings, Accounts: add the account. Connect the iPhone and turn
-   on Developer Mode on it (Settings, Privacy & Security).
-2. Create an empty iOS app project in Xcode with the bundle id of
+### 1. Xcode
+
+1. Install Xcode from the App Store or from
+   [developer.apple.com/download](https://developer.apple.com/download/applications/).
+2. Select it, if the Command Line Tools are selected so far
+   (`xcode-select -p` does not print a path inside `Xcode.app`):
+   `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
+3. Accept the license and install the extra packages:
+   `sudo xcodebuild -license accept`, then `xcodebuild -runFirstLaunch`.
+4. Download the iOS platform, which Xcode no longer ships with:
+   `xcodebuild -downloadPlatform iOS`.
+5. Check: `xcrun --sdk iphoneos --show-sdk-path` prints the path of the SDK.
+
+### 2. Apple account
+
+Pick one of the two. Either way `APP_ID` has to be a bundle id of your
+own (the one in `.env-example` is only an example); it cannot be changed
+for an existing profile.
+
+#### 2a. Free Apple account (Personal Team)
+
+Xcode, Settings, Accounts, "+", Apple Account (Xcode UI). The team shows
+up as "Your Name (Personal Team)". Its limits: profiles last 7 days, at
+most 3 devices, explicit app ids only (no wildcards), and only a few new
+app ids per week.
+
+#### 2b. Apple Developer Program (paid)
+
+Profiles and certificates last a year, and you can make them without
+Xcode (step 4b). You need:
+
+- The team id: [developer.apple.com/account](https://developer.apple.com/account),
+  Membership details.
+- Optional, for creating profiles from the command line: an App Store
+  Connect API key. [appstoreconnect.apple.com](https://appstoreconnect.apple.com),
+  Users and Access, Integrations, App Store Connect API, Team Keys
+  (the first time, the Account Holder has to request access there).
+  "Generate API Key" with:
+  - a name, e.g. "gio-playground signing",
+  - access "Admin": the lower roles may not create certificates and
+    profiles.
+
+  Then note the Key ID (in the list of keys) and the Issuer ID (above
+  the list), and download the key, `AuthKey_<KEY_ID>.p8`. It can be
+  downloaded only once; keep it outside the repository, e.g. in
+  `~/.appstoreconnect/private_keys/`. No script uses the key yet; see
+  step 4b for what it can do.
+
+Instead of the key you can also add the account in Xcode as in 2a and
+make the profile as in 4a; it then lasts a year as well.
+
+### 3. iPhone
+
+1. Connect the iPhone by cable, unlock it and confirm "Trust This
+   Computer" with the passcode.
+2. `scripts/ios.sh devices` (`xcrun devicectl list devices`) lists it;
+   its identifier goes into `IOS_DEVICE`. If it is not paired yet:
+   `xcrun devicectl manage pair --device <identifier>`.
+3. Turn on Developer Mode: on the iPhone, Settings, Privacy & Security,
+   Developer Mode; the iPhone restarts and asks once more. iOS shows this
+   switch only after the iPhone was connected to a Mac with Xcode. If it
+   is missing, open Window, Devices and Simulators in Xcode once while
+   the iPhone is connected (Xcode UI).
+4. Only for 2b with a profile made by hand: register the device at
+   [developer.apple.com/account/resources/devices](https://developer.apple.com/account/resources/devices/list)
+   with its UDID, which `xcrun devicectl device info details --device <identifier>`
+   prints.
+
+### 4. Certificate and provisioning profile
+
+#### 4a. With Xcode (2a, or 2b with the account in Xcode)
+
+1. Create an empty iOS app project in Xcode with the bundle id of
    `APP_ID` (Build Settings, Product Bundle Identifier), set up the
    signing with your team ("Set Up Signing…" in Xcode 27.1) and run it
-   once on the iPhone. That
-   creates the development certificate and the provisioning profile.
-3. `scripts/ios.sh profiles` lists the profiles with their app ids; put
+   once on the iPhone (Xcode UI). That creates the development
+   certificate and the provisioning profile.
+2. `scripts/ios.sh profiles` lists the profiles with their app ids; put
    the path of the one for `APP_ID` into `IOS_SIGNKEY`.
-   `scripts/ios.sh devices` lists the devices for `IOS_DEVICE`.
-4. `scripts/ios.sh`. If iOS asks, trust the developer on the iPhone
-   (Settings, General, VPN & Device Management).
+
+With a Personal Team, repeat this every 7 days (running the project once
+more renews the profile).
+
+#### 4b. In the developer portal (2b)
+
+At [developer.apple.com/account/resources](https://developer.apple.com/account/resources/):
+
+1. Identifiers, "+", App IDs, App: an explicit bundle id, the value of
+   `APP_ID`. No capabilities are needed.
+2. Certificates, "+", Apple Development. The portal asks for a
+   certificate signing request: in Keychain Access, Certificate
+   Assistant, "Request a Certificate From a Certificate Authority",
+   saved to disk. Download the certificate and open it; it lands in the
+   login keychain next to its private key.
+   `security find-identity -v -p codesigning` then lists an "Apple
+   Development: ..." identity. If it is listed as not trusted, the Apple
+   intermediate certificate is missing
+   ([apple.com/certificateauthority](https://www.apple.com/certificateauthority/),
+   "Worldwide Developer Relations").
+3. Profiles, "+", iOS App Development: the app id, the certificate and
+   the devices. Download the `.mobileprovision` and put its path into
+   `IOS_SIGNKEY`.
+
+A new device: register it (step 3.4), add it to the profile (Profiles,
+Edit) and download the profile again.
+
+With the API key, `xcodebuild` does all three steps for any Xcode project
+with automatic signing, e.g. the empty one of 4a:
+
+```sh
+xcodebuild -project Empty.xcodeproj -destination id=<identifier> \
+  -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+  -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8 \
+  -authenticationKeyID <KEY_ID> -authenticationKeyIssuerID <ISSUER_ID> \
+  DEVELOPMENT_TEAM=<TEAM_ID> PRODUCT_BUNDLE_IDENTIFIER=<APP_ID> build
+```
+
+The profile then shows up in `scripts/ios.sh profiles`.
+
+### 5. Build and run
+
+1. In `.env`: `APP_ID`, `IOS_SIGNKEY` and `IOS_DEVICE`.
+2. `scripts/ios.sh`. With a Personal Team iOS asks once to trust the
+   developer: on the iPhone, Settings, General, VPN & Device Management.
+
+### Notes
 
 Two things about gogio on current Xcode versions, both handled by the
 scripts:
