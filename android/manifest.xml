@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Added to the generated AndroidManifest.xml with gogio -manifest. As an
+     example it turns off the backup of the app's data; check it with
+     adb shell dumpsys package <APP_ID> (no ALLOW_BACKUP in the flags). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<application android:allowBackup="false"/>
+</manifest>
