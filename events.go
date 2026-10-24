@@ -39,7 +39,12 @@ func (l *eventLog) add(s string) {
 	// Also on stdout: adb logcat, the Xcode console, the terminal.
 	log.Print(s)
 	if changed != nil {
-		changed()
+		// Never from the caller's thread: entries also come from callbacks
+		// on the main thread (UIKit notifications, URLs), and there
+		// Window.Invalidate wakes the window synchronously, delivering
+		// events in the middle of the callback. On iOS that hung the app
+		// while UIKit connected the scene.
+		go changed()
 	}
 }
 
