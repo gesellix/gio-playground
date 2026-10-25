@@ -33,9 +33,10 @@ Where the patches are:
 
 - Gio: [gesellix/gio-forked](https://github.com/gesellix/gio-forked),
   sent as [gio-patches 72110](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72110)
-  (branch upstream-series); v2 (branch upstream-series-v2) makes iOS 13
-  the minimum and the UIScene life cycle unconditional. Editor.Wipe is
-  not sent yet.
+  (branch upstream-series); v2 makes iOS 13 the minimum and the UIScene
+  life cycle unconditional, and drops DecorationColors, which Elias
+  turned down in favour of no decorations of Gio's own (it stays in the
+  fork's branch pwdmgr). Editor.Wipe is not sent yet.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as

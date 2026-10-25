@@ -29,9 +29,9 @@ require (
 replace github.com/gesellix/gio-playground => ../
 
 // gioui.org: upstream main c2a339fa (2026-10-22) plus v2 of the Gio series
-// (gio-patches 72110, v2 after the review: iOS 13, UIScene unconditional)
-// and Editor.Wipe on top, the fork's branch pwdmgr
-// (github.com/gesellix/gio-forked).
+// (gio-patches 72110, v2 after the review: iOS 13, UIScene unconditional),
+// and DecorationColors (dropped from the series) and Editor.Wipe on top,
+// the fork's branch pwdmgr (github.com/gesellix/gio-forked).
 replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261025195040-bc7b14d1f5d7
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
