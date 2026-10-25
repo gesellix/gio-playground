@@ -28,18 +28,20 @@ require (
 
 replace github.com/gesellix/gio-playground => ../
 
-// gioui.org: upstream main c2a339fa (2026-10-22) plus the Gio patches as
-// sent upstream (gio-patches 72110) and Editor.Wipe on top, the fork's
-// branch pwdmgr (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261024180402-a4e76a086475
+// gioui.org: upstream main c2a339fa (2026-10-22) plus v2 of the Gio series
+// (gio-patches 72110, v2 after the review: iOS 13, UIScene unconditional)
+// and Editor.Wipe on top, the fork's branch pwdmgr
+// (github.com/gesellix/gio-forked).
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261025130827-4d4f4b34f79b
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).
 replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c
 
-// gioui.org/cmd (gogio, run as 'go tool gogio') upstream e2ff547 plus the js
-// build tags, -plist, -privacymanifest and -manifest, as sent upstream
-// (gio-patches 72106).
-replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261024105645-5522d0dadff1
+// gioui.org/cmd (gogio, run as 'go tool gogio') upstream 569aea7 plus
+// -plist, -privacymanifest and -manifest (gio-patches 72106) and the scene
+// manifest with iOS 13 as the default -minsdk (branch ios-scenes), the
+// fork's branch pwdmgr-v2 (github.com/gesellix/gio-cmd).
+replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261025182625-97e5531185cc
 
 tool gioui.org/cmd/gogio

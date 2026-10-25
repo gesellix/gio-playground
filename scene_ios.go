@@ -11,6 +11,7 @@ package playground
 void observeScenes(void);
 void disconnectScenes(void);
 int hasInfoKey(const char *key);
+char *infoString(const char *key);
 int hasResource(const char *name, const char *ext);
 */
 import "C"
@@ -30,6 +31,14 @@ func initPlatform() {
 	defer C.free(unsafe.Pointer(n))
 	defer C.free(unsafe.Pointer(ext))
 	events.add("Info.plist has UIApplicationSceneManifest: " + yesNo(C.hasInfoKey(k) != 0))
+	mk := C.CString("MinimumOSVersion")
+	defer C.free(unsafe.Pointer(mk))
+	min := "not set"
+	if v := C.infoString(mk); v != nil {
+		min = C.GoString(v)
+		C.free(unsafe.Pointer(v))
+	}
+	events.add("Info.plist MinimumOSVersion: " + min)
 	events.add("bundle has PrivacyInfo.xcprivacy: " + yesNo(C.hasResource(n, ext) != 0))
 }
 

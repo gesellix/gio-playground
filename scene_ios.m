@@ -1,5 +1,6 @@
 //go:build ios
 
+#include <string.h>
 #import <UIKit/UIKit.h>
 #include "_cgo_export.h"
 
@@ -47,6 +48,16 @@ void disconnectScenes(void) {
 
 int hasInfoKey(const char *key) {
 	return [NSBundle.mainBundle objectForInfoDictionaryKey:@(key)] != nil;
+}
+
+// infoString returns the string value of key in the Info.plist, or NULL.
+// The caller frees it.
+char *infoString(const char *key) {
+	id v = [NSBundle.mainBundle objectForInfoDictionaryKey:@(key)];
+	if (![v isKindOfClass:[NSString class]]) {
+		return NULL;
+	}
+	return strdup([(NSString *)v UTF8String]);
 }
 
 int hasResource(const char *name, const char *ext) {

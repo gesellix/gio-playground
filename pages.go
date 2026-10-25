@@ -76,7 +76,7 @@ type scenePage struct {
 
 func (*scenePage) title() string { return "URLs and iOS scenes" }
 func (*scenePage) about() string {
-	return "Gio: the UIScene life cycle on iOS (Gio series 3/4); gogio -plist for the scene manifest"
+	return "Gio: the UIScene life cycle on iOS (Gio series v2 4/5); gogio adds the scene manifest"
 }
 
 func (p *scenePage) layout(u *ui, gtx layout.Context) []layout.Widget {
