@@ -22,7 +22,7 @@ type clipboardPage struct {
 
 func (*clipboardPage) title() string { return "Clipboard: sensitive content" }
 func (*clipboardPage) about() string {
-	return "Gio: clipboard.WriteCmd.Sensitive (Gio series 1/4)"
+	return "Gio: clipboard.WriteCmd.Sensitive (Gio series v2 1/4)"
 }
 
 func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -54,7 +54,7 @@ type lifecyclePage struct{}
 
 func (*lifecyclePage) title() string { return "Background: Config.Hidden" }
 func (*lifecyclePage) about() string {
-	return "Gio: Config.Hidden on Android and iOS (Gio series 2/4)"
+	return "Gio: Config.Hidden on Android and iOS (Gio series v2 2/4)"
 }
 
 func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -76,7 +76,7 @@ type scenePage struct {
 
 func (*scenePage) title() string { return "URLs and iOS scenes" }
 func (*scenePage) about() string {
-	return "Gio: the UIScene life cycle on iOS (Gio series v2 4/5); gogio adds the scene manifest"
+	return "Gio: the UIScene life cycle on iOS (Gio series v2 4/4); gogio adds the scene manifest"
 }
 
 func (p *scenePage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -107,7 +107,7 @@ type titleBarPage struct {
 
 func (*titleBarPage) title() string { return "Title bar colors" }
 func (*titleBarPage) about() string {
-	return "Gio: app.DecorationColors (Gio series 4/4)"
+	return "Gio: app.DecorationColors (fork only, dropped from the Gio series)"
 }
 
 func (p *titleBarPage) layout(u *ui, gtx layout.Context) []layout.Widget {
