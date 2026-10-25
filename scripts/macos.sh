@@ -19,7 +19,15 @@ build() {
 	*) arch=amd64 ;;
 	esac
 	rm -rf "$app"
-	gogio -target macos -arch "$arch" -appid "$APP_ID" -name "$APP_NAME" -schemes "$URL_SCHEME" -ldflags "$(ldflags schemes)" -o "$app" .
+	local flags=(-target macos -arch "$arch" -appid "$APP_ID" -name "$APP_NAME")
+	if [ "$GIO" = platformdir ]; then
+		# The complete Info.plist sets the version, the scheme and the
+		# name of the executable.
+		flags+=(-platformdir "$(platformdir macos)")
+		gogio "${flags[@]}" -ldflags "$(ldflags platformdir)" -o "$app" .
+	else
+		gogio "${flags[@]}" -schemes "$URL_SCHEME" -ldflags "$(ldflags schemes)" -o "$app" .
+	fi
 	echo "built $app"
 }
 

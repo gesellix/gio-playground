@@ -11,12 +11,24 @@
 apk=$root/build/$APP_NAME-$GIO.apk
 
 build() {
-	local flags=(-target android -arch "${ANDROID_ARCH:-arm64}" -appid "$APP_ID" -name "$APP_NAME" -schemes "$URL_SCHEME")
-	local used=schemes
-	if [ "$GIO" = fork ]; then
-		flags+=(-manifest "$root/android/manifest.xml")
-		used+=,manifest
-	fi
+	local flags=(-target android -arch "${ANDROID_ARCH:-arm64}" -appid "$APP_ID" -name "$APP_NAME")
+	local used
+	case $GIO in
+	platformdir)
+		# The complete AndroidManifest.xml sets the version, the scheme and
+		# the backup; -appid only has to match it.
+		flags+=(-platformdir "$(platformdir android)")
+		used=platformdir
+		;;
+	fork)
+		flags+=(-schemes "$URL_SCHEME" -manifest "$root/android/manifest.xml")
+		used=schemes,manifest
+		;;
+	*)
+		flags+=(-schemes "$URL_SCHEME")
+		used=schemes
+		;;
+	esac
 	if [ -n "${ANDROID_SIGNKEY:-}" ]; then
 		flags+=(-signkey "$ANDROID_SIGNKEY" -signpass "${ANDROID_SIGNPASS:-}")
 	fi

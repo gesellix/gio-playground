@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The complete AndroidManifest.xml for GIO=platformdir: gogio -platformdir
+     uses it as it is, instead of generating one. The scripts replace @APP_ID@,
+     @APP_NAME@ and @URL_SCHEME@ and write the result to
+     build/platform/android/. Started from gogio's own output; it differs in
+     the version (2.0.0, 7), minSdkVersion 24 and allowBackup="false". Check
+     them with adb shell dumpsys package <APP_ID> (versionName, minSdk, no
+     ALLOW_BACKUP among the flags). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="@APP_ID@"
+	android:versionCode="7"
+	android:versionName="2.0.0">
+	<uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
+	<application android:label="@APP_NAME@" android:allowBackup="false">
+		<activity android:name="org.gioui.GioActivity"
+			android:label="@APP_NAME@"
+			android:theme="@style/Theme.GioApp"
+			android:configChanges="screenSize|screenLayout|smallestScreenSize|orientation|keyboardHidden"
+			android:windowSoftInputMode="adjustResize"
+			android:launchMode="singleInstance"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:scheme="@URL_SCHEME@"></data>
+			</intent-filter>
+		</activity>
+	</application>
+</manifest>

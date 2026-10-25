@@ -29,20 +29,36 @@ fi
 : "${URL_SCHEME:=gioplayground}"
 
 case $GIO in
-fork | upstream) ;;
+fork | upstream | platformdir) ;;
 *)
-	echo "GIO is fork or upstream, not $GIO" >&2
+	echo "GIO is fork, upstream or platformdir, not $GIO" >&2
 	exit 2
 	;;
 esac
 
-# The module of the build: fork (with the patches) or upstream.
+# The module of the build: fork (with the patches), upstream, or
+# platformdir (the fork's Gio, with the gogio of -platformdir).
 moddir=$root/$GIO
 mkdir -p "$root/build"
 
 # gogio runs as a tool of the module, so each build gets its own gogio:
-# the fork's with -plist, -manifest and -privacymanifest, or upstream's.
+# the fork's with -plist, -manifest and -privacymanifest, upstream's, or
+# the one with -platformdir.
 gogio() { (cd "$moddir" && go tool gogio "$@"); }
+
+# platformdir writes the complete platform files of platform/<target>/ to
+# build/platform/<target>/, with the values of .env, and prints the
+# directory to pass to gogio -platformdir.
+platformdir() {
+	local target=$1 dir=$root/build/platform
+	rm -rf "${dir:?}/$target"
+	mkdir -p "$dir/$target"
+	local f
+	for f in "$root/platform/$target"/*; do
+		sed -e "s|@APP_ID@|$APP_ID|g" -e "s|@APP_NAME@|$APP_NAME|g" -e "s|@URL_SCHEME@|$URL_SCHEME|g" "$f" >"$dir/$target/$(basename "$f")"
+	done
+	echo "$dir"
+}
 
 # ldflags passes the gogio flags of the build (a comma separated list) and
 # the URL scheme to the program, which shows them.

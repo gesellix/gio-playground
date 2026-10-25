@@ -280,7 +280,9 @@ func (p *logPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 }
 
 // registersScheme reports whether the build registered urlScheme (gogio
-// -schemes), which the scripts note in buildFlags.
+// -schemes, or the complete platform files of -platformdir), which the
+// scripts note in buildFlags.
 func registersScheme() bool {
-	return slices.Contains(strings.Split(buildFlags, ","), "schemes")
+	flags := strings.Split(buildFlags, ",")
+	return slices.Contains(flags, "schemes") || slices.Contains(flags, "platformdir")
 }
