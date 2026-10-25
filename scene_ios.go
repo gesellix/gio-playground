@@ -31,14 +31,9 @@ func initPlatform() {
 	defer C.free(unsafe.Pointer(n))
 	defer C.free(unsafe.Pointer(ext))
 	events.add("Info.plist has UIApplicationSceneManifest: " + yesNo(C.hasInfoKey(k) != 0))
-	mk := C.CString("MinimumOSVersion")
-	defer C.free(unsafe.Pointer(mk))
-	min := "not set"
-	if v := C.infoString(mk); v != nil {
-		min = C.GoString(v)
-		C.free(unsafe.Pointer(v))
+	for _, key := range []string{"MinimumOSVersion", "CFBundleShortVersionString", "CFBundleExecutable", "PlaygroundPlatformFile"} {
+		events.add("Info.plist " + key + ": " + infoString(key))
 	}
-	events.add("Info.plist MinimumOSVersion: " + min)
 	events.add("bundle has PrivacyInfo.xcprivacy: " + yesNo(C.hasResource(n, ext) != 0))
 }
 
@@ -49,6 +44,19 @@ func disconnectScene() { C.disconnectScenes() }
 //export playgroundSceneEvent
 func playgroundSceneEvent(s *C.char) {
 	events.add("UIScene: " + strings.TrimSpace(C.GoString(s)))
+}
+
+// infoString returns the string value of key in the Info.plist, or "not
+// set".
+func infoString(key string) string {
+	k := C.CString(key)
+	defer C.free(unsafe.Pointer(k))
+	v := C.infoString(k)
+	if v == nil {
+		return "not set"
+	}
+	defer C.free(unsafe.Pointer(v))
+	return C.GoString(v)
 }
 
 func yesNo(b bool) string {

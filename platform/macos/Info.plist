@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+The complete Info.plist for GIO=platformdir: gogio -platformdir uses it as
+it is, instead of generating one. The scripts replace @APP_ID@, @APP_NAME@
+and @URL_SCHEME@ and write the result to build/platform/macos/. Started
+from gogio's own output; it differs in the version (2.0.0, 7), the name of
+the executable and the key PlaygroundPlatformFile.
+-->
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>@APP_NAME@Exe</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>@APP_ID@</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>7</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>@URL_SCHEME@</string>
+			</array>
+		</dict>
+	</array>
+	<key>PlaygroundPlatformFile</key>
+	<string>platform/macos/Info.plist</string>
+</dict>
+</plist>

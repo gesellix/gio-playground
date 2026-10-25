@@ -19,9 +19,19 @@ need() {
 
 build() {
 	need IOS_SIGNKEY "the path of the provisioning profile, see scripts/ios.sh profiles"
-	local flags=(-target ios -appid "$APP_ID" -name "$APP_NAME" -schemes "$URL_SCHEME" -signkey "$IOS_SIGNKEY")
-	local used=schemes
+	local flags=(-target ios -appid "$APP_ID" -name "$APP_NAME" -signkey "$IOS_SIGNKEY")
+	local used
 	local minsdk=${IOS_MINSDK:-}
+	if [ "$GIO" = platformdir ]; then
+		# The complete Info.plist sets the version, the scheme and
+		# MinimumOSVersion; -appid only has to match it.
+		flags+=(-platformdir "$(platformdir ios)")
+		gogio "${flags[@]}" -ldflags "$(ldflags platformdir)" -o "$ipa" .
+		echo "built $ipa"
+		return
+	fi
+	flags+=(-schemes "$URL_SCHEME")
+	used=schemes
 	if [ "$GIO" = fork ]; then
 		# The fork's gogio writes the scene manifest itself, and without
 		# -minsdk it builds for iOS 13.

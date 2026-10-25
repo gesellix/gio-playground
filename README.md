@@ -2,7 +2,8 @@
 
 A small [Gio](https://gioui.org) program to try out patches to Gio, gio-x
 and gogio on real devices, and to show what they change. The same program
-is built twice: with the patches (`fork/`) and without them (`upstream/`).
+is built with the patches (`fork/`) and without them (`upstream/`), and a
+third time with the gogio prototype of `-platformdir` (`platformdir/`).
 
 Each page of the app exercises one patch. An event log that all pages
 share records what the program receives (configuration changes, URLs,
@@ -40,7 +41,9 @@ Where the patches are:
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as
   [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106);
   the scene manifest and iOS 13 as the default `-minsdk` go with Gio v2
-  (branch ios-scenes).
+  (branch ios-scenes). `-platformdir` (branch platform-dir-v2, not sent:
+  a proposal to Elias) replaces the generated AndroidManifest.xml and
+  Info.plist with complete files.
 
 ## Layout
 
@@ -51,6 +54,10 @@ Where the patches are:
   with its versions of Gio, gio-x and gogio (`go tool gogio`).
 - `ios/` and `android/` hold the files for gogio's `-privacymanifest`
   and `-manifest`.
+- `platformdir/` is a third program, the fork's with the gogio of
+  `-platformdir`, and `platform/` holds its complete platform files per
+  target, as templates: the scripts fill in `APP_ID`, `APP_NAME` and
+  `URL_SCHEME` and write them to `build/platform/`.
 - `scripts/` builds, installs and starts the app.
 
 ## Setup
@@ -72,7 +79,17 @@ scripts/android.sh                 # build, install (keeps data), start
 scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
 GIO=upstream scripts/android.sh    # the same without the patches
+GIO=platformdir scripts/ios.sh     # with complete platform files
 ```
+
+With `GIO=platformdir` gogio gets `-platformdir` instead of `-schemes`,
+`-manifest`, `-plist`, `-privacymanifest` and `-minsdk`; the files in
+`platform/` set the version (2.0.0, 7), the URL scheme and the minimum
+version. To see that they are used as they are: on iOS the event log
+shows the `CFBundleExecutable` (`<APP_NAME>Exe`), the version and the key
+`PlaygroundPlatformFile`; on Android `adb shell dumpsys package <APP_ID>`
+shows versionName 2.0.0, minSdk 24 and no `ALLOW_BACKUP`; on macOS the
+bundle's executable is `<APP_NAME>Exe`.
 
 Each script lists its commands at the top (`build`, `run`, `uninstall`,
 ...). Variables from the environment win over `.env`. Both builds use the
