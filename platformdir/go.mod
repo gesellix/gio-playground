@@ -32,7 +32,7 @@ replace github.com/gesellix/gio-playground => ../
 // (gio-patches 72110, v2 after the review: iOS 13, UIScene unconditional)
 // and Editor.Wipe on top, the fork's branch pwdmgr
 // (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261025130827-4d4f4b34f79b
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261025195040-bc7b14d1f5d7
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).
