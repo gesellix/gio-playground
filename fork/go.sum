@@ -13,10 +13,10 @@ github.com/chromedp/chromedp v0.13.6 h1:xlNunMyzS5bu3r/QKrb3fzX6ow3WBQ6oao+J65PG
 github.com/chromedp/chromedp v0.13.6/go.mod h1:h8GPP6ZtLMLsU8zFbTcb7ZDGCvCy8j/vRoFmRltQx9A=
 github.com/chromedp/sysutil v1.1.0 h1:PUFNv5EcprjqXZD9nJb9b/c9ibAbxiYo4exNWZyipwM=
 github.com/chromedp/sysutil v1.1.0/go.mod h1:WiThHUdltqCNKGc4gaU50XgYjwjYIhKWoHGPTUfWTJ8=
-github.com/gesellix/gio-cmd v0.0.0-20261024105645-5522d0dadff1 h1:dAhu4uhxOedWDJE9r6GVsLT53x11BnurQbKzohek2MQ=
-github.com/gesellix/gio-cmd v0.0.0-20261024105645-5522d0dadff1/go.mod h1:k+swG87oGEdqK3z44kS1ewXe0RYcNFBWVyz7U0jBPQw=
-github.com/gesellix/gio-forked v0.10.4-0.20261024180402-a4e76a086475 h1:YrGJEyPboou0RJtFqaHExm67KDo7cFWfhy35I6qiUkI=
-github.com/gesellix/gio-forked v0.10.4-0.20261024180402-a4e76a086475/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
+github.com/gesellix/gio-cmd v0.0.0-20261025182625-97e5531185cc h1:jvt3njjupbzZdhr7+Dr5QsMtL3Apwnea5aC0mX1DRqc=
+github.com/gesellix/gio-cmd v0.0.0-20261025182625-97e5531185cc/go.mod h1:k+swG87oGEdqK3z44kS1ewXe0RYcNFBWVyz7U0jBPQw=
+github.com/gesellix/gio-forked v0.10.4-0.20261025130827-4d4f4b34f79b h1:OjrTiNZIZtS6NAYi6dMw9xWFCVE1+W8onCU2s5V9afQ=
+github.com/gesellix/gio-forked v0.10.4-0.20261025130827-4d4f4b34f79b/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
 github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c h1:bNqOU91Jrjugg1ZdbsHhYbp5fCzYk/upkumN6l0Gzp0=
 github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c/go.mod h1:zAKc92Mp1xlficmcPkUFOcREY01zMiqLmO4qhiJEEO4=
 github.com/go-json-experiment/json v0.0.0-20250417205406-170dfdcf87d1 h1:+VexzzkMLb1tnvpuQdGT/DicIRW7MN8ozsXqBMgp0Hk=

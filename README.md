@@ -15,15 +15,16 @@ afterwards ("Event log", "Copy the log").
 |------------------------------|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Clipboard: sensitive content | Gio: `clipboard.WriteCmd.Sensitive`     | Android 13+: the preview shows dots. iOS: no Universal Clipboard. Windows: not in Win+V. KDE: no Klipper entry. macOS: skipped by nspasteboard.org clipboard managers. |
 | Background: Config.Hidden    | Gio: `app.Config.Hidden` (Android, iOS) | Home, app switcher, screen off: `Hidden=true`, then `false` on return. Notification shade, Control Center: only `Focused` changes.                                     |
-| URLs and iOS scenes          | Gio: UIScene life cycle; gogio `-plist` | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                |
+| URLs and iOS scenes          | Gio: UIScene life cycle; gogio manifest | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                |
 | Title bar colors             | Gio: `app.DecorationColors`             | Where Gio draws its own title bar (Wayland under GNOME), the colors change.                                                                                            |
 | Editor.Wipe                  | Gio: `widget.Editor.Wipe`               | The editor is empty and stays usable.                                                                                                                                  |
 | Files: export and save       | gio-x: explorer                         | Android: export with an unknown extension works; the log shows the URI and name of the file. Desktop: `SaveFilePath`.                                                  |
 | Event log                    |                                         | Everything above, newest first.                                                                                                                                        |
 
 The gogio patches show at build time: on iOS the log starts with whether
-the Info.plist has the scene manifest (`-plist`) and whether the app has
-its privacy manifest (`-privacymanifest`); on Android `-manifest` turns
+the Info.plist has the scene manifest (gogio writes it), its
+MinimumOSVersion (13 without `-minsdk`) and whether the app has its
+privacy manifest (`-privacymanifest`); on Android `-manifest` turns
 off the app's backup (`adb shell dumpsys package <APP_ID>`: no
 `ALLOW_BACKUP` among the flags). Not covered: the js build tags fix.
 
@@ -31,11 +32,15 @@ Where the patches are:
 
 - Gio: [gesellix/gio-forked](https://github.com/gesellix/gio-forked),
   sent as [gio-patches 72110](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72110)
-  (branch upstream-series); Editor.Wipe is not sent yet.
+  (branch upstream-series); v2 (branch upstream-series-v2) makes iOS 13
+  the minimum and the UIScene life cycle unconditional. Editor.Wipe is
+  not sent yet.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as
-  [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106).
+  [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106);
+  the scene manifest and iOS 13 as the default `-minsdk` go with Gio v2
+  (branch ios-scenes).
 
 ## Layout
 
@@ -44,8 +49,8 @@ Where the patches are:
   accident; the fork passes those APIs in as `playground.Features`.
 - `fork/` and `upstream/` are the two programs, each a module of its own
   with its versions of Gio, gio-x and gogio (`go tool gogio`).
-- `ios/` and `android/` hold the files for gogio's `-plist`,
-  `-privacymanifest` and `-manifest`.
+- `ios/` and `android/` hold the files for gogio's `-privacymanifest`
+  and `-manifest`.
 - `scripts/` builds, installs and starts the app.
 
 ## Setup
@@ -214,9 +219,10 @@ The profile then shows up in `scripts/ios.sh profiles`.
 Two things about gogio on current Xcode versions, both handled by the
 scripts:
 
-- Without `-minsdk`, gogio builds for iOS 10, which the current SDKs can
-  no longer link (no libarclite). The scripts pass `IOS_MINSDK`
-  (default 15).
+- Without `-minsdk`, upstream gogio builds for iOS 10, which the current
+  SDKs can no longer link (no libarclite). For upstream the scripts pass
+  `IOS_MINSDK` (default 15); the fork's gogio builds for iOS 13 and gets
+  `-minsdk` only when `IOS_MINSDK` is set.
 - Newer Xcode versions keep the profiles in
   `~/Library/Developer/Xcode/UserData/Provisioning Profiles/`, while
   gogio only searches `~/Library/MobileDevice/Provisioning Profiles/`
