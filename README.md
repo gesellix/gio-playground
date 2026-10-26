@@ -2,7 +2,8 @@
 
 A small [Gio](https://gioui.org) program to try out patches to Gio, gio-x
 and gogio on real devices, and to show what they change. The same program
-is built with the patches (`fork/`) and without them (`upstream/`), and a
+is built with the patches (`fork/`) and with upstream as it is
+(`upstream/`, which by now has some of them), and a
 third time with the gogio prototype of `-platformdir` (`platformdir/`).
 
 Each page of the app exercises one patch. An event log that all pages
@@ -33,18 +34,23 @@ Where the patches are:
 
 - Gio: [gesellix/gio-forked](https://github.com/gesellix/gio-forked),
   sent as [gio-patches 72110](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72110)
-  (branch upstream-series); v2 makes iOS 13 the minimum and the UIScene
-  life cycle unconditional, and drops DecorationColors, which Elias
-  turned down in favour of no decorations of Gio's own (it stays in the
-  fork's branch pwdmgr). Editor.Wipe is not sent yet.
+  and, after the review, as v2
+  ([gio-patches 72119](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72119)).
+  Upstream applied iOS 13 as the minimum, the UIScene life cycle and
+  `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25); Config.Hidden
+  is not applied yet. DecorationColors, which Elias turned down in favour
+  of no decorations of Gio's own, and Editor.Wipe (not sent yet) stay in
+  the fork. The fork's branch pwdmgr is upstream plus these three.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as
-  [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106);
-  the scene manifest and iOS 13 as the default `-minsdk` go with Gio v2
-  (branch ios-scenes). `-platformdir` (branch platform-dir-v2, not sent:
-  a proposal to Elias) replaces the generated AndroidManifest.xml and
-  Info.plist with complete files.
+  [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106)
+  (`-plist`, `-privacymanifest`, `-manifest`; turned down for complete
+  platform files, kept in the fork's branch pwdmgr). The scene manifest
+  and iOS 13 as the default `-minsdk` are upstream (c57ee40, 2026-10-25).
+  `-platformdir` (branch platform-dir-v3, not sent: a proposal to Elias)
+  replaces the generated AndroidManifest.xml and Info.plist with
+  complete files.
 
 ## Layout
 
@@ -79,7 +85,7 @@ scripts/macos.sh                   # macOS: build the .app and open it
 scripts/android.sh                 # build, install (keeps data), start
 scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
-GIO=upstream scripts/android.sh    # the same without the patches
+GIO=upstream scripts/android.sh    # the same with upstream as it is
 GIO=platformdir scripts/ios.sh     # with complete platform files
 ```
 
@@ -234,18 +240,15 @@ The profile then shows up in `scripts/ios.sh profiles`.
 
 ### Notes
 
-Two things about gogio on current Xcode versions, both handled by the
-scripts:
+About gogio on current Xcode versions, handled by the scripts:
 
-- Without `-minsdk`, upstream gogio builds for iOS 10, which the current
-  SDKs can no longer link (no libarclite). For upstream the scripts pass
-  `IOS_MINSDK` (default 15); the fork's gogio builds for iOS 13 and gets
-  `-minsdk` only when `IOS_MINSDK` is set.
 - Newer Xcode versions keep the profiles in
   `~/Library/Developer/Xcode/UserData/Provisioning Profiles/`, while
   gogio only searches `~/Library/MobileDevice/Provisioning Profiles/`
   without `-signkey`. The scripts always pass `-signkey`.
 
-With the iOS 27 SDK, `GIO=upstream scripts/ios.sh` builds an app that
-closes right after launch: upstream Gio has no UIScene support and
-upstream gogio cannot add the scene manifest (TN3187).
+Without `-minsdk`, gogio builds for iOS 13; the scripts pass `-minsdk`
+only when `IOS_MINSDK` is set. Before c57ee40, upstream gogio built for
+iOS 10, which the current SDKs can no longer link (no libarclite), and
+without the scene manifest an app built with the iOS 27 SDK closed right
+after launch (TN3187); both are fixed upstream now.

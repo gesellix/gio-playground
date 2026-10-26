@@ -22,7 +22,7 @@ type clipboardPage struct {
 
 func (*clipboardPage) title() string { return "Clipboard: sensitive content" }
 func (*clipboardPage) about() string {
-	return "Gio: clipboard.WriteCmd.Sensitive (Gio series v2 1/4)"
+	return "Gio: clipboard.WriteCmd.Sensitive (upstream since 20998f2d)"
 }
 
 func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -54,7 +54,7 @@ type lifecyclePage struct{}
 
 func (*lifecyclePage) title() string { return "Background: Config.Hidden" }
 func (*lifecyclePage) about() string {
-	return "Gio: Config.Hidden on Android and iOS (Gio series v2 2/4)"
+	return "Gio: Config.Hidden on Android and iOS (Gio series v2 2/4, not applied yet)"
 }
 
 func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -76,7 +76,7 @@ type scenePage struct {
 
 func (*scenePage) title() string { return "URLs and iOS scenes" }
 func (*scenePage) about() string {
-	return "Gio: the UIScene life cycle on iOS (Gio series v2 4/4); gogio adds the scene manifest"
+	return "Gio: the UIScene life cycle on iOS (upstream since 45b8c2fe); gogio adds the scene manifest (upstream since c57ee40)"
 }
 
 func (p *scenePage) layout(u *ui, gtx layout.Context) []layout.Widget {

@@ -4,8 +4,9 @@
 // be shown (or copied) afterwards.
 //
 // The program itself is in the modules fork (with the patches) and
-// upstream (without them). This package builds against upstream Gio and
-// gio-x; the fork passes the APIs that the patches add as Features.
+// upstream (as it is, with the patches upstream applied). This package
+// builds against upstream Gio and gio-x; each module passes the APIs of the
+// patches it has as Features.
 package playground
 
 import (

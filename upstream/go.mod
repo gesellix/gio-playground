@@ -2,12 +2,13 @@ module github.com/gesellix/gio-playground/upstream
 
 go 1.27.3
 
-// The state before the patches: upstream Gio, gio-x and gogio.
+// Upstream Gio, gio-x and gogio, without the patches upstream does not
+// have yet.
 require github.com/gesellix/gio-playground v0.0.0
 
 require (
-	gioui.org v0.10.4-0.20261022163903-c2a339fad4aa // indirect
-	gioui.org/cmd v0.10.4-0.20261023054843-e2ff547b93d0 // indirect
+	gioui.org v0.10.4-0.20261026070653-20998f2d0b4a // indirect
+	gioui.org/cmd v0.10.4-0.20261026065032-c57ee406638b // indirect
 	gioui.org/shader v1.0.9 // indirect
 	gioui.org/x v0.10.3 // indirect
 	git.wow.st/gmp/jni v0.0.0-20260821030830-2b2c1e0034f1 // indirect

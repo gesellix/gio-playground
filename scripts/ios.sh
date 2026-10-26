@@ -32,16 +32,11 @@ build() {
 	fi
 	flags+=(-schemes "$URL_SCHEME")
 	used=schemes
+	# gogio writes the scene manifest itself, and without -minsdk it
+	# builds for iOS 13 (upstream since c57ee40).
 	if [ "$GIO" = fork ]; then
-		# The fork's gogio writes the scene manifest itself, and without
-		# -minsdk it builds for iOS 13.
 		flags+=(-privacymanifest "$root/ios/PrivacyInfo.xcprivacy")
 		used+=,privacymanifest
-	else
-		echo "note: upstream gogio cannot add the scene manifest; built with the iOS 27 SDK or later, the app closes right after launch (TN3187)" >&2
-		# Without -minsdk, upstream gogio builds for iOS 10, which current
-		# SDKs no longer link (no libarclite).
-		minsdk=${minsdk:-15}
 	fi
 	if [ -n "$minsdk" ]; then
 		flags+=(-minsdk "$minsdk")

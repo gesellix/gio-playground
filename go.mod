@@ -6,7 +6,7 @@ go 1.27.3
 // of the patches by accident. The modules fork and upstream choose the
 // versions the program is built with.
 require (
-	gioui.org v0.10.4-0.20261022163903-c2a339fad4aa
+	gioui.org v0.10.4-0.20261026070653-20998f2d0b4a
 	gioui.org/x v0.10.3
 )
 
