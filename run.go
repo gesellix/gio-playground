@@ -10,11 +10,13 @@
 package playground
 
 import (
+	"fmt"
 	"image/color"
 	"io"
 	"log"
 	"os"
 	"strings"
+	"sync/atomic"
 
 	"gioui.org/app"
 	"gioui.org/io/clipboard"
@@ -30,8 +32,9 @@ type Features struct {
 	Name string
 	// MarkSensitive sets clipboard.WriteCmd.Sensitive.
 	MarkSensitive func(*clipboard.WriteCmd)
-	// Hidden returns app.Config.Hidden.
-	Hidden func(app.Config) bool
+	// Background reports whether e is an app.BackgroundEvent, and its
+	// Background field.
+	Background func(e event.Event) (background, ok bool)
 	// DecorationColors returns the app.DecorationColors option.
 	DecorationColors func(bg, fg color.NRGBA) app.Option
 	// Wipe calls widget.Editor.Wipe.
@@ -65,9 +68,17 @@ func Run(f Features) {
 	}()
 	// app.Events instead of app.Main: it also yields the events that belong
 	// to no window, such as the URLs that open the program.
+	// It also yields the background (Android, iOS), before the platform's
+	// callback returns.
 	app.Events(func(e event.Event) bool {
 		if u, ok := e.(app.URLEvent); ok {
 			events.add("URLEvent " + u.URL.String())
+		}
+		if f.Background != nil {
+			if b, ok := f.Background(e); ok {
+				background.Store(int32(backgroundOf(b)))
+				events.add(fmt.Sprintf("BackgroundEvent Background=%v", b))
+			}
 		}
 		return true
 	})
@@ -84,9 +95,19 @@ func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd
 	return cmd
 }
 
-func (f Features) hidden(c app.Config) (hidden, ok bool) {
-	if f.Hidden == nil {
-		return false, false
+// background is the state of the last BackgroundEvent: it comes from
+// app.Events, and the window shows it.
+var background atomic.Int32
+
+const (
+	backgroundNone = iota // no BackgroundEvent yet
+	backgroundFalse
+	backgroundTrue
+)
+
+func backgroundOf(b bool) int {
+	if b {
+		return backgroundTrue
 	}
-	return f.Hidden(c), true
+	return backgroundFalse
 }

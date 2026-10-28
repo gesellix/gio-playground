@@ -8,6 +8,7 @@ import (
 
 	"gioui.org/app"
 	"gioui.org/io/clipboard"
+	"gioui.org/io/event"
 	"gioui.org/widget"
 	"gioui.org/x/explorer"
 
@@ -18,7 +19,10 @@ func main() {
 	playground.Run(playground.Features{
 		Name:          "platformdir",
 		MarkSensitive: func(c *clipboard.WriteCmd) { c.Sensitive = true },
-		Hidden:        func(c app.Config) bool { return c.Hidden },
+		Background: func(e event.Event) (bool, bool) {
+			b, ok := e.(app.BackgroundEvent)
+			return b.Background, ok
+		},
 		DecorationColors: func(bg, fg color.NRGBA) app.Option {
 			return app.DecorationColors(bg, fg)
 		},

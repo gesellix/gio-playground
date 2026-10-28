@@ -52,21 +52,29 @@ func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 
 type lifecyclePage struct{}
 
-func (*lifecyclePage) title() string { return "Background: Config.Hidden" }
+func (*lifecyclePage) title() string { return "Background: BackgroundEvent" }
 func (*lifecyclePage) about() string {
-	return "Gio: Config.Hidden on Android and iOS (Gio series v2 2/4, not applied yet)"
+	return "Gio: app.BackgroundEvent on Android and iOS, through app.Events (replaces Config.Hidden of v2 2/4, not sent yet)"
 }
 
 func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
-	hidden := "not in this build"
-	if h, ok := u.f.hidden(u.cfg); ok {
-		hidden = fmt.Sprint(h)
+	state := "not in this build"
+	if u.f.Background != nil {
+		switch background.Load() {
+		case backgroundNone:
+			state = "none yet"
+		case backgroundFalse:
+			state = "false"
+		case backgroundTrue:
+			state = "true"
+		}
 	}
 	return []layout.Widget{
-		u.mono(fmt.Sprintf("Focused=%v Hidden=%s Mode=%v", u.cfg.Focused, hidden, u.cfg.Mode)),
-		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows Hidden=true, then Hidden=false."),
+		u.mono(fmt.Sprintf("Focused=%v Background=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
+		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows Background=true, then Background=false."),
 		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
-		u.text("On the desktop Hidden stays false."),
+		u.text("Android: switch dark mode on or off (the activity is re-created): no BackgroundEvent."),
+		u.text("On the desktop no BackgroundEvent comes."),
 	}
 }
 

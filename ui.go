@@ -98,11 +98,6 @@ func (u *ui) config(c app.Config) {
 	if first || c.Focused != prev.Focused {
 		changes = append(changes, fmt.Sprintf("Focused=%v", c.Focused))
 	}
-	if h, ok := u.f.hidden(c); ok {
-		if ph, _ := u.f.hidden(prev); first || h != ph {
-			changes = append(changes, fmt.Sprintf("Hidden=%v", h))
-		}
-	}
 	if first || c.Mode != prev.Mode {
 		changes = append(changes, fmt.Sprintf("Mode=%v", c.Mode))
 	}
