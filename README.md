@@ -13,15 +13,15 @@ afterwards ("Event log", "Copy the log").
 
 ## Pages
 
-| Page                         | Patch                                     | What to check                                                                                                                                                              |
-|------------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Clipboard: sensitive content | Gio: `clipboard.WriteCmd.Sensitive`       | Android 13+: the preview shows dots. iOS: no Universal Clipboard. Windows: not in Win+V. KDE: no Klipper entry. macOS: skipped by nspasteboard.org clipboard managers.     |
-| Background: BackgroundEvent  | Gio: `app.BackgroundEvent` (Android, iOS) | Home, app switcher, screen off: `Background=true`, then `false` on return. Notification shade, Control Center: only `Focused` changes. Android dark mode switch: no event. |
-| URLs and iOS scenes          | Gio: UIScene life cycle; gogio manifest   | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                    |
-| Title bar colors             | Gio: `app.DecorationColors`               | Where Gio draws its own title bar (Wayland under GNOME), the colors change.                                                                                                |
-| Editor.Wipe                  | Gio: `widget.Editor.Wipe`                 | The editor is empty and stays usable.                                                                                                                                      |
-| Files: export and save       | gio-x: explorer                           | Android: export with an unknown extension works; the log shows the URI and name of the file. Desktop: `SaveFilePath`.                                                      |
-| Event log                    |                                           | Everything above, newest first.                                                                                                                                            |
+| Page                               | Patch                                                     | What to check                                                                                                                                                                                                          |
+|------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Clipboard: sensitive content       | Gio: `clipboard.WriteCmd.Sensitive`                       | Android 13+: the preview shows dots. iOS: no Universal Clipboard. Windows: not in Win+V. KDE: no Klipper entry. macOS: skipped by nspasteboard.org clipboard managers.                                                 |
+| Suspend: SuspendEvent, ResumeEvent | Gio: `app.SuspendEvent`, `app.ResumeEvent` (Android, iOS) | Home, app switcher, screen off: `SuspendEvent`, then `ResumeEvent` on return. Android document picker: `SuspendEvent`. Notification shade, Control Center: only `Focused` changes. Android dark mode switch: no event. |
+| URLs and iOS scenes                | Gio: UIScene life cycle; gogio manifest                   | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                                                                |
+| Title bar colors                   | Gio: `app.DecorationColors`                               | Where Gio draws its own title bar (Wayland under GNOME), the colors change.                                                                                                                                            |
+| Editor.Wipe                        | Gio: `widget.Editor.Wipe`                                 | The editor is empty and stays usable.                                                                                                                                                                                  |
+| Files: export and save             | gio-x: explorer                                           | Android: export with an unknown extension works; the log shows the URI and name of the file. Desktop: `SaveFilePath`.                                                                                                  |
+| Event log                          |                                                           | Everything above, newest first.                                                                                                                                                                                        |
 
 The gogio patches show at build time: on iOS the log starts with whether
 the Info.plist has the scene manifest (gogio writes it), its
@@ -40,7 +40,7 @@ Where the patches are:
   `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25). Config.Hidden
   (v2 2/4) is not applied: Elias would rather report the background
   through `app.Events`, so the fork's branch app-background-event has
-  `app.BackgroundEvent` instead (not sent yet). DecorationColors, which
+  `app.SuspendEvent` and `app.ResumeEvent` instead (not sent yet). DecorationColors, which
   Elias turned down in favour of no decorations of Gio's own, and
   Editor.Wipe (not sent yet) stay in the fork. The fork's branch
   pwdmgr-background-event is upstream plus these three.

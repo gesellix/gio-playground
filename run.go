@@ -10,7 +10,6 @@
 package playground
 
 import (
-	"fmt"
 	"image/color"
 	"io"
 	"log"
@@ -32,9 +31,9 @@ type Features struct {
 	Name string
 	// MarkSensitive sets clipboard.WriteCmd.Sensitive.
 	MarkSensitive func(*clipboard.WriteCmd)
-	// Background reports whether e is an app.BackgroundEvent, and its
-	// Background field.
-	Background func(e event.Event) (background, ok bool)
+	// Suspend reports whether e is an app.SuspendEvent (suspended) or an
+	// app.ResumeEvent (not suspended).
+	Suspend func(e event.Event) (suspended, ok bool)
 	// DecorationColors returns the app.DecorationColors option.
 	DecorationColors func(bg, fg color.NRGBA) app.Option
 	// Wipe calls widget.Editor.Wipe.
@@ -68,16 +67,20 @@ func Run(f Features) {
 	}()
 	// app.Events instead of app.Main: it also yields the events that belong
 	// to no window, such as the URLs that open the program.
-	// It also yields the background (Android, iOS), before the platform's
+	// It also yields the suspension (Android, iOS), before the platform's
 	// callback returns.
 	app.Events(func(e event.Event) bool {
 		if u, ok := e.(app.URLEvent); ok {
 			events.add("URLEvent " + u.URL.String())
 		}
-		if f.Background != nil {
-			if b, ok := f.Background(e); ok {
-				background.Store(int32(backgroundOf(b)))
-				events.add(fmt.Sprintf("BackgroundEvent Background=%v", b))
+		if f.Suspend != nil {
+			if s, ok := f.Suspend(e); ok {
+				suspend.Store(int32(suspendOf(s)))
+				if s {
+					events.add("SuspendEvent")
+				} else {
+					events.add("ResumeEvent")
+				}
 			}
 		}
 		return true
@@ -95,19 +98,19 @@ func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd
 	return cmd
 }
 
-// background is the state of the last BackgroundEvent: it comes from
-// app.Events, and the window shows it.
-var background atomic.Int32
+// suspend is the state of the last SuspendEvent or ResumeEvent: it comes
+// from app.Events, and the window shows it.
+var suspend atomic.Int32
 
 const (
-	backgroundNone = iota // no BackgroundEvent yet
-	backgroundFalse
-	backgroundTrue
+	suspendNone = iota // no SuspendEvent or ResumeEvent yet
+	suspendResumed
+	suspendSuspended
 )
 
-func backgroundOf(b bool) int {
-	if b {
-		return backgroundTrue
+func suspendOf(suspended bool) int {
+	if suspended {
+		return suspendSuspended
 	}
-	return backgroundFalse
+	return suspendResumed
 }

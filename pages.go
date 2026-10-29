@@ -52,29 +52,30 @@ func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 
 type lifecyclePage struct{}
 
-func (*lifecyclePage) title() string { return "Background: BackgroundEvent" }
+func (*lifecyclePage) title() string { return "Suspend: SuspendEvent, ResumeEvent" }
 func (*lifecyclePage) about() string {
-	return "Gio: app.BackgroundEvent on Android and iOS, through app.Events (replaces Config.Hidden of v2 2/4, not sent yet)"
+	return "Gio: app.SuspendEvent and app.ResumeEvent on Android and iOS, through app.Events (replace Config.Hidden of v2 2/4, not sent yet)"
 }
 
 func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	state := "not in this build"
-	if u.f.Background != nil {
-		switch background.Load() {
-		case backgroundNone:
+	if u.f.Suspend != nil {
+		switch suspend.Load() {
+		case suspendNone:
 			state = "none yet"
-		case backgroundFalse:
-			state = "false"
-		case backgroundTrue:
-			state = "true"
+		case suspendResumed:
+			state = "ResumeEvent"
+		case suspendSuspended:
+			state = "SuspendEvent"
 		}
 	}
 	return []layout.Widget{
-		u.mono(fmt.Sprintf("Focused=%v Background=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
-		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows Background=true, then Background=false."),
+		u.mono(fmt.Sprintf("Focused=%v Last=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
+		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows SuspendEvent, then ResumeEvent."),
 		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
-		u.text("Android: switch dark mode on or off (the activity is re-created): no BackgroundEvent."),
-		u.text("On the desktop no BackgroundEvent comes."),
+		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
+		u.text("Android: the document picker (Files page) belongs to another app, so it reports SuspendEvent."),
+		u.text("On the desktop neither event comes."),
 	}
 }
 
