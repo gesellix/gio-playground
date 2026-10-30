@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Added to the generated AndroidManifest.xml with gogio -manifest. As an
      example it turns off the backup of the app's data; check it with
-     adb shell dumpsys package <APP_ID> (no ALLOW_BACKUP in the flags). -->
+     adb shell dumpsys package <APP_ID> (no ALLOW_BACKUP in the flags). It
+     also declares the second activity of the Suspend page
+     (SecondActivity.java). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<application android:allowBackup="false"/>
+	<application android:allowBackup="false">
+		<activity android:name="com.github.gesellix.gioplayground.SecondActivity"
+			android:exported="false" />
+	</application>
 </manifest>

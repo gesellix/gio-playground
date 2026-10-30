@@ -50,14 +50,23 @@ func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	return rows
 }
 
-type lifecyclePage struct{}
+type lifecyclePage struct {
+	second widget.Clickable
+}
 
 func (*lifecyclePage) title() string { return "Suspend: SuspendEvent, ResumeEvent" }
 func (*lifecyclePage) about() string {
 	return "Gio: app.SuspendEvent and app.ResumeEvent on Android and iOS, through app.Events (replace Config.Hidden of v2 2/4, not sent yet)"
 }
 
-func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
+func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
+	if p.second.Clicked(gtx) {
+		if err := startSecondActivity(u.view); err != nil {
+			events.add("second activity: " + err.Error())
+		} else {
+			events.add("second activity started")
+		}
+	}
 	state := "not in this build"
 	if u.f.Suspend != nil {
 		switch suspend.Load() {
@@ -69,7 +78,7 @@ func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 			state = "SuspendEvent"
 		}
 	}
-	return []layout.Widget{
+	rows := []layout.Widget{
 		u.mono(fmt.Sprintf("Focused=%v Last=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
 		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows SuspendEvent, then ResumeEvent."),
 		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
@@ -77,6 +86,13 @@ func (*lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		u.text("Android: the document picker (Files page) belongs to another app, so it reports SuspendEvent."),
 		u.text("On the desktop neither event comes."),
 	}
+	if canStartSecondActivity {
+		rows = append(rows,
+			u.button(&p.second, "Open a second activity"),
+			u.text("Android: a plain activity of this app, without Gio, in front of this one: no event while it is open or closed. Home or screen off from there: SuspendEvent. GIO=upstream does not declare it, so nothing opens."),
+		)
+	}
+	return rows
 }
 
 type scenePage struct {

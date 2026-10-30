@@ -47,6 +47,7 @@ type ui struct {
 
 	cfg    app.Config
 	gotCfg bool
+	view   uintptr // Android: the View of the last ViewEvent
 }
 
 func newUI(w *app.Window, f Features) *ui {
@@ -82,6 +83,7 @@ func (u *ui) run() error {
 			u.config(e.Config)
 		case app.ViewEvent:
 			events.add(fmt.Sprintf("%T valid=%v", e, e.Valid()))
+			u.view = androidView(e)
 		case app.FrameEvent:
 			gtx := app.NewContext(&u.ops, e)
 			u.layout(gtx)
