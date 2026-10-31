@@ -116,9 +116,10 @@ var mainWindow atomic.Pointer[app.Window]
 var invalidateSync atomic.Bool
 
 // invalidateInHandler calls Window.Invalidate in the app.Events handler when
-// the switch is on. Before the Gio patch "don't hold invMu while calling the
-// driver in Window.Invalidate" that hangs on iOS: the main thread waits for
-// a mutex it holds itself, and the watchdog kills the app in the
+// the switch is on. Without the Gio patch that posts the macOS/iOS wakeup to
+// the main queue also from the main thread, that hangs on iOS: the wakeup
+// runs the event loop inline, the main thread waits for a mutex that
+// Window.Invalidate holds itself, and the watchdog kills the app in the
 // background. The log line after the call shows that it returned.
 func invalidateInHandler() {
 	w := mainWindow.Load()

@@ -100,7 +100,7 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		}
 		rows = append(rows,
 			u.button(&p.invalidate, label),
-			u.text("On: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that releases invMu first, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."),
+			u.text("On: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that posts the wakeup to the main queue, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."),
 		)
 	}
 	if canStartSecondActivity {
