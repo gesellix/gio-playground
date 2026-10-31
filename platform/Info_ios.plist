@@ -4,7 +4,7 @@
 <!--
 The complete Info.plist for GIO=platformdir: gogio -platformdir uses it as
 it is, instead of generating one. The scripts replace @APP_ID@, @APP_NAME@
-and @URL_SCHEME@ and write the result to build/platform/ios/. Started from
+and @URL_SCHEME@ and write the result to build/platform/. Started from
 gogio's own output; it differs in the version (2.0.0, 7), the name of the
 executable, MinimumOSVersion 15.0 and the key PlaygroundPlatformFile,
 which the app's event log shows.
@@ -69,6 +69,6 @@ which the app's event log shows.
 		</dict>
 	</array>
 	<key>PlaygroundPlatformFile</key>
-	<string>platform/ios/Info.plist</string>
+	<string>platform/Info_ios.plist</string>
 </dict>
 </plist>

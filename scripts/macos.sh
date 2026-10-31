@@ -23,7 +23,7 @@ build() {
 	if [ "$GIO" = platformdir ]; then
 		# The complete Info.plist sets the version, the scheme and the
 		# name of the executable.
-		flags+=(-platformdir "$(platformdir macos)")
+		flags+=(-platformdir "$(platformdir)")
 		gogio "${flags[@]}" -ldflags "$(ldflags platformdir)" -o "$app" .
 	else
 		gogio "${flags[@]}" -schemes "$URL_SCHEME" -ldflags "$(ldflags schemes)" -o "$app" .

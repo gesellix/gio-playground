@@ -46,16 +46,17 @@ mkdir -p "$root/build"
 # the one with -platformdir.
 gogio() { (cd "$moddir" && go tool gogio "$@"); }
 
-# platformdir writes the complete platform files of platform/<target>/ to
-# build/platform/<target>/, with the values of .env, and prints the
-# directory to pass to gogio -platformdir.
+# platformdir writes the complete platform files of platform/ to
+# build/platform/, with the values of .env, and prints the directory to
+# pass to gogio -platformdir. gogio picks the files of its target by their
+# names (Info_ios.plist, AndroidManifest.xml, ...).
 platformdir() {
-	local target=$1 dir=$root/build/platform
-	rm -rf "${dir:?}/$target"
-	mkdir -p "$dir/$target"
+	local dir=$root/build/platform
+	rm -rf "${dir:?}"
+	mkdir -p "$dir"
 	local f
-	for f in "$root/platform/$target"/*; do
-		sed -e "s|@APP_ID@|$APP_ID|g" -e "s|@APP_NAME@|$APP_NAME|g" -e "s|@URL_SCHEME@|$URL_SCHEME|g" "$f" >"$dir/$target/$(basename "$f")"
+	for f in "$root/platform"/*; do
+		sed -e "s|@APP_ID@|$APP_ID|g" -e "s|@APP_NAME@|$APP_NAME|g" -e "s|@URL_SCHEME@|$URL_SCHEME|g" "$f" >"$dir/$(basename "$f")"
 	done
 	echo "$dir"
 }

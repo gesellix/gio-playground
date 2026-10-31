@@ -13,9 +13,16 @@ require (
 	gioui.org/shader v1.0.9 // indirect
 	git.wow.st/gmp/jni v0.0.0-20260821030830-2b2c1e0034f1 // indirect
 	github.com/akavel/rsrc v0.10.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.4 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/tc-hib/go-winres v0.3.3 // indirect
+	github.com/tc-hib/winres v0.2.1 // indirect
+	github.com/urfave/cli/v2 v2.25.7 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/exp/shiny v0.0.0-20261014143641-f0251eb4aa3e // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
@@ -40,8 +47,11 @@ replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261030084245-a1b
 // (gio-patches 72104).
 replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c
 
-tool gioui.org/cmd/gogio
+tool (
+	gioui.org/cmd/gogio
+	github.com/tc-hib/go-winres
+)
 
 // gioui.org/cmd (gogio) upstream c57ee40 plus the -platformdir prototype,
-// the fork's branch platform-dir-v3 (github.com/gesellix/gio-cmd).
-replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261026075412-53b6a33ec411
+// the fork's branch platform-dir-v4 (github.com/gesellix/gio-cmd).
+replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261031084054-8127c457deba

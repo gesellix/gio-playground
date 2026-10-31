@@ -17,7 +17,7 @@ build() {
 	platformdir)
 		# The complete AndroidManifest.xml sets the version, the scheme and
 		# the backup; -appid only has to match it.
-		flags+=(-platformdir "$(platformdir android)")
+		flags+=(-platformdir "$(platformdir)")
 		used=platformdir
 		;;
 	fork)

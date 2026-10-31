@@ -1,3 +1,11 @@
 .idea/
 .env
 build/
+# gogio writes to the module directory without -o (<module>.exe, .apk,
+# .ipa, .app) and leaves its Windows resources there (*_windows_*.syso).
+*.exe
+*.apk
+*.aab
+*.ipa
+*.app/
+*.syso

@@ -2,7 +2,7 @@
 <!-- The complete AndroidManifest.xml for GIO=platformdir: gogio -platformdir
      uses it as it is, instead of generating one. The scripts replace @APP_ID@,
      @APP_NAME@ and @URL_SCHEME@ and write the result to
-     build/platform/android/. Started from gogio's own output; it differs in
+     build/platform/. Started from gogio's own output; it differs in
      the version (2.0.0, 7), minSdkVersion 24, allowBackup="false" and the
      second activity of the Suspend page (SecondActivity.java). Check
      them with adb shell dumpsys package <APP_ID> (versionName, minSdk, no

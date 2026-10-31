@@ -25,7 +25,7 @@ build() {
 	if [ "$GIO" = platformdir ]; then
 		# The complete Info.plist sets the version, the scheme and
 		# MinimumOSVersion; -appid only has to match it.
-		flags+=(-platformdir "$(platformdir ios)")
+		flags+=(-platformdir "$(platformdir)")
 		gogio "${flags[@]}" -ldflags "$(ldflags platformdir)" -o "$ipa" .
 		echo "built $ipa"
 		return

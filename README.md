@@ -13,15 +13,15 @@ afterwards ("Event log", "Copy the log").
 
 ## Pages
 
-| Page                               | Patch                                                     | What to check                                                                                                                                                                                                          |
-|------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Clipboard: sensitive content       | Gio: `clipboard.WriteCmd.Sensitive`                       | Android 13+: the preview shows dots. iOS: no Universal Clipboard. Windows: not in Win+V. KDE: no Klipper entry. macOS: skipped by nspasteboard.org clipboard managers.                                                 |
+| Page                               | Patch                                                     | What to check                                                                                                                                                                                                                                                                                                                                                                |
+|------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Clipboard: sensitive content       | Gio: `clipboard.WriteCmd.Sensitive`                       | Android 13+: the preview shows dots. iOS: no Universal Clipboard. Windows: not in Win+V. KDE: no Klipper entry. macOS: skipped by nspasteboard.org clipboard managers.                                                                                                                                                                                                       |
 | Suspend: SuspendEvent, ResumeEvent | Gio: `app.SuspendEvent`, `app.ResumeEvent` (Android, iOS) | Home, app switcher, screen off: `SuspendEvent`, then `ResumeEvent` on return. Android document picker: `SuspendEvent`. Notification shade, Control Center: only `Focused` changes. Android dark mode switch: no event. Android "Open a second activity" (an activity of the app without Gio): no event while it is in front, `SuspendEvent` when the app is left from there. |
-| URLs and iOS scenes                | Gio: UIScene life cycle; gogio manifest                   | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                                                                |
-| Title bar colors                   | Gio: `app.DecorationColors`                               | Where Gio draws its own title bar (Wayland under GNOME), the colors change.                                                                                                                                            |
-| Editor.Wipe                        | Gio: `widget.Editor.Wipe`                                 | The editor is empty and stays usable.                                                                                                                                                                                  |
-| Files: export and save             | gio-x: explorer                                           | Android: export with an unknown extension works; the log shows the URI and name of the file. Desktop: `SaveFilePath`.                                                                                                  |
-| Event log                          |                                                           | Everything above, newest first.                                                                                                                                                                                        |
+| URLs and iOS scenes                | Gio: UIScene life cycle; gogio manifest                   | Open `gioplayground://hello` while running and after closing the app (cold start): a `URLEvent` each time. "Disconnect the scene", then reopen the app.                                                                                                                                                                                                                      |
+| Title bar colors                   | Gio: `app.DecorationColors`                               | Where Gio draws its own title bar (Wayland under GNOME), the colors change.                                                                                                                                                                                                                                                                                                  |
+| Editor.Wipe                        | Gio: `widget.Editor.Wipe`                                 | The editor is empty and stays usable.                                                                                                                                                                                                                                                                                                                                        |
+| Files: export and save             | gio-x: explorer                                           | Android: export with an unknown extension works; the log shows the URI and name of the file. Desktop: `SaveFilePath`.                                                                                                                                                                                                                                                        |
+| Event log                          |                                                           | Everything above, newest first.                                                                                                                                                                                                                                                                                                                                              |
 
 The gogio patches show at build time: on iOS the log starts with whether
 the Info.plist has the scene manifest (gogio writes it), its
@@ -51,9 +51,10 @@ Where the patches are:
   (`-plist`, `-privacymanifest`, `-manifest`; turned down for complete
   platform files, kept in the fork's branch pwdmgr). The scene manifest
   and iOS 13 as the default `-minsdk` are upstream (c57ee40, 2026-10-25).
-  `-platformdir` (branch platform-dir-v3, not sent: a proposal to Elias)
-  replaces the generated AndroidManifest.xml and Info.plist with
-  complete files.
+  `-platformdir` (branch platform-dir-v4, not sent yet) replaces the
+  generated files with complete ones, named after their target as Elias
+  suggested (Info_ios.plist, with Info.plist as the fallback), and on
+  Windows with a ready resource object (rsrc_windows_<arch>.syso).
 
 ## Layout
 
@@ -65,9 +66,13 @@ Where the patches are:
 - `ios/` and `android/` hold the files for gogio's `-privacymanifest`
   and `-manifest`.
 - `platformdir/` is a third program, the fork's with the gogio of
-  `-platformdir`, and `platform/` holds its complete platform files per
-  target, as templates: the scripts fill in `APP_ID`, `APP_NAME` and
-  `URL_SCHEME` and write them to `build/platform/`.
+  `-platformdir`, and `platform/` holds its complete platform files as
+  templates (`AndroidManifest.xml`, `Info_ios.plist`,
+  `PrivacyInfo_ios.xcprivacy`, `Info_macos.plist`, `winres.json`): the
+  scripts fill in `APP_ID`, `APP_NAME` and `URL_SCHEME` and write them to
+  `build/platform/`, where gogio picks the files of its target by name.
+  For Windows, `scripts/windows.sh` first makes `rsrc_windows_<arch>.syso`
+  from `winres.json` with go-winres (a tool of the `platformdir` module).
 - `scripts/` builds, installs and starts the app.
 
 ## Setup
@@ -88,6 +93,7 @@ scripts/macos.sh                   # macOS: build the .app and open it
 scripts/android.sh                 # build, install (keeps data), start
 scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
+scripts/windows.sh                 # build the .exe (copy it to Windows)
 GIO=upstream scripts/android.sh    # the same with upstream as it is
 GIO=platformdir scripts/ios.sh     # with complete platform files
 ```
@@ -99,7 +105,11 @@ version. To see that they are used as they are: on iOS the event log
 shows the `CFBundleExecutable` (`<APP_NAME>Exe`), the version and the key
 `PlaygroundPlatformFile`; on Android `adb shell dumpsys package <APP_ID>`
 shows versionName 2.0.0, minSdk 24 and no `ALLOW_BACKUP`; on macOS the
-bundle's executable is `<APP_NAME>Exe`.
+bundle's executable is `<APP_NAME>Exe`; on Windows the properties of the
+.exe (Details) show version 2.0.0.7 and the comment
+`PlaygroundPlatformFile`, both from `winres.json`. gogio looks for the
+files only with `-platformdir` (an opt-in while the change is tried
+out).
 
 Each script lists its commands at the top (`build`, `run`, `uninstall`,
 ...). Variables from the environment win over `.env`. Both builds use the

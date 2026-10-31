@@ -4,7 +4,7 @@
 <!--
 The complete Info.plist for GIO=platformdir: gogio -platformdir uses it as
 it is, instead of generating one. The scripts replace @APP_ID@, @APP_NAME@
-and @URL_SCHEME@ and write the result to build/platform/macos/. Started
+and @URL_SCHEME@ and write the result to build/platform/. Started
 from gogio's own output; it differs in the version (2.0.0, 7), the name of
 the executable and the key PlaygroundPlatformFile.
 -->
@@ -33,6 +33,6 @@ the executable and the key PlaygroundPlatformFile.
 		</dict>
 	</array>
 	<key>PlaygroundPlatformFile</key>
-	<string>platform/macos/Info.plist</string>
+	<string>platform/Info_macos.plist</string>
 </dict>
 </plist>
