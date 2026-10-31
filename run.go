@@ -59,6 +59,7 @@ func Run(f Features) {
 	initPlatform()
 	go func() {
 		w := new(app.Window)
+		mainWindow.Store(w)
 		w.Option(app.Title("Gio playground"))
 		if err := newUI(w, f).run(); err != nil {
 			log.Fatal(err)
@@ -76,6 +77,7 @@ func Run(f Features) {
 		if f.Background != nil {
 			if s, ok := f.Background(e); ok {
 				background.Store(int32(backgroundOf(s)))
+				invalidateInHandler()
 				if !s {
 					foregrounds.Add(1)
 				}
@@ -104,6 +106,29 @@ func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd
 // background is the state of the last BackgroundEvent or ForegroundEvent: it comes
 // from app.Events, and the window shows it.
 var background atomic.Int32
+
+// mainWindow is the program's window, for invalidateInHandler.
+var mainWindow atomic.Pointer[app.Window]
+
+// invalidateSync is the switch of the Background page: invalidate the
+// window right in the BackgroundEvent and ForegroundEvent handler, on the
+// main thread, as a program would that asks for a redraw when it leaves.
+var invalidateSync atomic.Bool
+
+// invalidateInHandler calls Window.Invalidate in the app.Events handler when
+// the switch is on. Before the Gio patch "don't hold invMu while calling the
+// driver in Window.Invalidate" that hangs on iOS: the main thread waits for
+// a mutex it holds itself, and the watchdog kills the app in the
+// background. The log line after the call shows that it returned.
+func invalidateInHandler() {
+	w := mainWindow.Load()
+	if !invalidateSync.Load() || w == nil {
+		return
+	}
+	events.add("calling Window.Invalidate in the handler (main thread)")
+	w.Invalidate()
+	events.add("Window.Invalidate returned")
+}
 
 // foregrounds counts the ForegroundEvents, so that the window can tell its
 // first frame after one.

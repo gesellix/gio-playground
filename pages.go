@@ -51,7 +51,8 @@ func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 }
 
 type lifecyclePage struct {
-	second widget.Clickable
+	second     widget.Clickable
+	invalidate widget.Clickable
 }
 
 func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
@@ -66,6 +67,11 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		} else {
 			events.add("second activity started")
 		}
+	}
+	if p.invalidate.Clicked(gtx) {
+		on := !invalidateSync.Load()
+		invalidateSync.Store(on)
+		events.add(fmt.Sprintf("Window.Invalidate in the handler: %v", on))
 	}
 	state := "not in this build"
 	if u.f.Background != nil {
@@ -86,6 +92,16 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		u.text("Android: the document picker (Files page) belongs to another app, so it reports BackgroundEvent."),
 		u.text("On the desktop neither event comes."),
 		u.text("Rotation (iOS): leave the app, turn the phone in another app that rotates (Safari, Photos), come back. The log shows the frame size before leaving and the first FrameEvent after ForegroundEvent: it should have the new size."),
+	}
+	if u.f.Background != nil {
+		label := "Window.Invalidate in the handler: off"
+		if invalidateSync.Load() {
+			label = "Window.Invalidate in the handler: ON"
+		}
+		rows = append(rows,
+			u.button(&p.invalidate, label),
+			u.text("On: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that releases invMu first, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."),
+		)
 	}
 	if canStartSecondActivity {
 		rows = append(rows,
