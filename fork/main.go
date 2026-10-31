@@ -18,11 +18,11 @@ func main() {
 	playground.Run(playground.Features{
 		Name:          "fork",
 		MarkSensitive: func(c *clipboard.WriteCmd) { c.Sensitive = true },
-		Suspend: func(e event.Event) (bool, bool) {
+		Background: func(e event.Event) (bool, bool) {
 			switch e.(type) {
-			case app.SuspendEvent:
+			case app.BackgroundEvent:
 				return true, true
-			case app.ResumeEvent:
+			case app.ForegroundEvent:
 				return false, true
 			}
 			return false, false

@@ -15,8 +15,8 @@ github.com/chromedp/sysutil v1.1.0 h1:PUFNv5EcprjqXZD9nJb9b/c9ibAbxiYo4exNWZyipw
 github.com/chromedp/sysutil v1.1.0/go.mod h1:WiThHUdltqCNKGc4gaU50XgYjwjYIhKWoHGPTUfWTJ8=
 github.com/gesellix/gio-cmd v0.0.0-20261026075116-f147ae0fe09d h1:4pMOwMYw+yCTYWpNUYOYDwxql3dRH2OWpaPyztIaSog=
 github.com/gesellix/gio-cmd v0.0.0-20261026075116-f147ae0fe09d/go.mod h1:k+swG87oGEdqK3z44kS1ewXe0RYcNFBWVyz7U0jBPQw=
-github.com/gesellix/gio-forked v0.10.4-0.20261030084245-a1b49eee7597 h1:XJ9xU0ll2530pkSDtCd0a6umoESPm4ArS980h77fnAI=
-github.com/gesellix/gio-forked v0.10.4-0.20261030084245-a1b49eee7597/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
+github.com/gesellix/gio-forked v0.10.4-0.20261031091025-2ab32f100436 h1:NOc+LUSGbl8pJrpW6aEIIrVkG836klRv2UwKCd+gitg=
+github.com/gesellix/gio-forked v0.10.4-0.20261031091025-2ab32f100436/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
 github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c h1:bNqOU91Jrjugg1ZdbsHhYbp5fCzYk/upkumN6l0Gzp0=
 github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c/go.mod h1:zAKc92Mp1xlficmcPkUFOcREY01zMiqLmO4qhiJEEO4=
 github.com/go-json-experiment/json v0.0.0-20250417205406-170dfdcf87d1 h1:+VexzzkMLb1tnvpuQdGT/DicIRW7MN8ozsXqBMgp0Hk=

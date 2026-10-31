@@ -37,11 +37,12 @@ replace github.com/gesellix/gio-playground => ../
 
 // gioui.org: upstream main 20998f2d (2026-10-25), which has iOS 13, the
 // UIScene life cycle and clipboard Sensitive from v2 of the Gio series
-// (gio-patches 72119), plus app.SuspendEvent and ResumeEvent (replace Config.Hidden
-// of v2 2/4, not sent yet), DecorationColors (dropped from the series) and
+// (gio-patches 72119), plus app.BackgroundEvent and ForegroundEvent (v4 of
+// 2/4, which replaces Config.Hidden), DecorationColors (dropped from the
+// series) and
 // Editor.Wipe, the fork's branch pwdmgr-background-event
 // (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261030084245-a1b49eee7597
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261031091025-2ab32f100436
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).

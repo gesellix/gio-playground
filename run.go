@@ -31,9 +31,9 @@ type Features struct {
 	Name string
 	// MarkSensitive sets clipboard.WriteCmd.Sensitive.
 	MarkSensitive func(*clipboard.WriteCmd)
-	// Suspend reports whether e is an app.SuspendEvent (suspended) or an
-	// app.ResumeEvent (not suspended).
-	Suspend func(e event.Event) (suspended, ok bool)
+	// Background reports whether e is an app.BackgroundEvent (in the background) or an
+	// app.ForegroundEvent (in the foreground).
+	Background func(e event.Event) (background, ok bool)
 	// DecorationColors returns the app.DecorationColors option.
 	DecorationColors func(bg, fg color.NRGBA) app.Option
 	// Wipe calls widget.Editor.Wipe.
@@ -73,13 +73,13 @@ func Run(f Features) {
 		if u, ok := e.(app.URLEvent); ok {
 			events.add("URLEvent " + u.URL.String())
 		}
-		if f.Suspend != nil {
-			if s, ok := f.Suspend(e); ok {
-				suspend.Store(int32(suspendOf(s)))
+		if f.Background != nil {
+			if s, ok := f.Background(e); ok {
+				background.Store(int32(backgroundOf(s)))
 				if s {
-					events.add("SuspendEvent")
+					events.add("BackgroundEvent")
 				} else {
-					events.add("ResumeEvent")
+					events.add("ForegroundEvent")
 				}
 			}
 		}
@@ -98,19 +98,19 @@ func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd
 	return cmd
 }
 
-// suspend is the state of the last SuspendEvent or ResumeEvent: it comes
+// background is the state of the last BackgroundEvent or ForegroundEvent: it comes
 // from app.Events, and the window shows it.
-var suspend atomic.Int32
+var background atomic.Int32
 
 const (
-	suspendNone = iota // no SuspendEvent or ResumeEvent yet
-	suspendResumed
-	suspendSuspended
+	backgroundNone = iota // no BackgroundEvent or ForegroundEvent yet
+	inForeground
+	inBackground
 )
 
-func suspendOf(suspended bool) int {
-	if suspended {
-		return suspendSuspended
+func backgroundOf(bg bool) int {
+	if bg {
+		return inBackground
 	}
-	return suspendResumed
+	return inForeground
 }

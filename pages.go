@@ -54,9 +54,9 @@ type lifecyclePage struct {
 	second widget.Clickable
 }
 
-func (*lifecyclePage) title() string { return "Suspend: SuspendEvent, ResumeEvent" }
+func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
 func (*lifecyclePage) about() string {
-	return "Gio: app.SuspendEvent and app.ResumeEvent on Android and iOS, through app.Events (replace Config.Hidden of v2 2/4, not sent yet)"
+	return "Gio: app.BackgroundEvent and app.ForegroundEvent on Android and iOS, through app.Events (v4 of 2/4, replaces Config.Hidden)"
 }
 
 func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -68,28 +68,28 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		}
 	}
 	state := "not in this build"
-	if u.f.Suspend != nil {
-		switch suspend.Load() {
-		case suspendNone:
+	if u.f.Background != nil {
+		switch background.Load() {
+		case backgroundNone:
 			state = "none yet"
-		case suspendResumed:
-			state = "ResumeEvent"
-		case suspendSuspended:
-			state = "SuspendEvent"
+		case inForeground:
+			state = "ForegroundEvent"
+		case inBackground:
+			state = "BackgroundEvent"
 		}
 	}
 	rows := []layout.Widget{
 		u.mono(fmt.Sprintf("Focused=%v Last=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
-		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows SuspendEvent, then ResumeEvent."),
+		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows BackgroundEvent, then ForegroundEvent."),
 		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
 		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
-		u.text("Android: the document picker (Files page) belongs to another app, so it reports SuspendEvent."),
+		u.text("Android: the document picker (Files page) belongs to another app, so it reports BackgroundEvent."),
 		u.text("On the desktop neither event comes."),
 	}
 	if canStartSecondActivity {
 		rows = append(rows,
 			u.button(&p.second, "Open a second activity"),
-			u.text("Android: a plain activity of this app, without Gio, in front of this one: no event while it is open or closed. Home or screen off from there: SuspendEvent. GIO=upstream does not declare it, so nothing opens."),
+			u.text("Android: a plain activity of this app, without Gio, in front of this one: no event while it is open or closed. Home or screen off from there: BackgroundEvent. GIO=upstream does not declare it, so nothing opens."),
 		)
 	}
 	return rows
