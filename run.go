@@ -76,6 +76,9 @@ func Run(f Features) {
 		if f.Background != nil {
 			if s, ok := f.Background(e); ok {
 				background.Store(int32(backgroundOf(s)))
+				if !s {
+					foregrounds.Add(1)
+				}
 				if s {
 					events.add("BackgroundEvent")
 				} else {
@@ -101,6 +104,10 @@ func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd
 // background is the state of the last BackgroundEvent or ForegroundEvent: it comes
 // from app.Events, and the window shows it.
 var background atomic.Int32
+
+// foregrounds counts the ForegroundEvents, so that the window can tell its
+// first frame after one.
+var foregrounds atomic.Int32
 
 const (
 	backgroundNone = iota // no BackgroundEvent or ForegroundEvent yet

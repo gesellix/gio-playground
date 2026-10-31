@@ -50,12 +50,12 @@ type ui struct {
 	gotCfg bool
 	view   uintptr // Android: the View of the last ViewEvent
 
-	// The size and insets of the last frame, and the background state
-	// at that frame: frame logs what changed (the rotation test).
+	// The size and insets of the last frame, and the ForegroundEvents
+	// counted at that frame: frame logs what changed (the rotation test).
 	frameSize   image.Point
 	frameInsets app.Insets
 	gotFrame    bool
-	frameBg     int32
+	frameFg     int32
 }
 
 func newUI(w *app.Window, f Features) *ui {
@@ -105,10 +105,10 @@ func (u *ui) run() error {
 // after a ForegroundEvent in any case: whether a size seen while in the
 // background arrives with the program's return (the rotation test).
 func (u *ui) frame(e app.FrameEvent) {
-	bg := background.Load()
-	back := bg == inForeground && u.frameBg == inBackground
+	fg := foregrounds.Load()
+	back := u.gotFrame && fg != u.frameFg
 	changed := !u.gotFrame || e.Size != u.frameSize || e.Insets != u.frameInsets
-	u.frameSize, u.frameInsets, u.gotFrame, u.frameBg = e.Size, e.Insets, true, bg
+	u.frameSize, u.frameInsets, u.gotFrame, u.frameFg = e.Size, e.Insets, true, fg
 	if !changed && !back {
 		return
 	}
