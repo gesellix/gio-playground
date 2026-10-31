@@ -56,7 +56,7 @@ type lifecyclePage struct {
 
 func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
 func (*lifecyclePage) about() string {
-	return "Gio: app.BackgroundEvent and app.ForegroundEvent on Android and iOS, through app.Events (v4 of 2/4, replaces Config.Hidden)"
+	return "Gio: app.BackgroundEvent and app.ForegroundEvent on Android and iOS, through app.Events (v5 of 2/4, replaces Config.Hidden)"
 }
 
 func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
@@ -85,6 +85,7 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
 		u.text("Android: the document picker (Files page) belongs to another app, so it reports BackgroundEvent."),
 		u.text("On the desktop neither event comes."),
+		u.text("Rotation (iOS): leave the app, turn the phone in another app that rotates (Safari, Photos), come back. The log shows the frame size before leaving and the first FrameEvent after ForegroundEvent: it should have the new size."),
 	}
 	if canStartSecondActivity {
 		rows = append(rows,

@@ -2,6 +2,7 @@ package playground
 
 import (
 	"fmt"
+	"image"
 	"runtime"
 	"strings"
 
@@ -48,6 +49,13 @@ type ui struct {
 	cfg    app.Config
 	gotCfg bool
 	view   uintptr // Android: the View of the last ViewEvent
+
+	// The size and insets of the last frame, and the background state
+	// at that frame: frame logs what changed (the rotation test).
+	frameSize   image.Point
+	frameInsets app.Insets
+	gotFrame    bool
+	frameBg     int32
 }
 
 func newUI(w *app.Window, f Features) *ui {
@@ -85,11 +93,31 @@ func (u *ui) run() error {
 			events.add(fmt.Sprintf("%T valid=%v", e, e.Valid()))
 			u.view = androidView(e)
 		case app.FrameEvent:
+			u.frame(e)
 			gtx := app.NewContext(&u.ops, e)
 			u.layout(gtx)
 			e.Frame(gtx.Ops)
 		}
 	}
+}
+
+// frame logs a frame whose size or insets changed, and the first frame
+// after a ForegroundEvent in any case: whether a size seen while in the
+// background arrives with the program's return (the rotation test).
+func (u *ui) frame(e app.FrameEvent) {
+	bg := background.Load()
+	back := bg == inForeground && u.frameBg == inBackground
+	changed := !u.gotFrame || e.Size != u.frameSize || e.Insets != u.frameInsets
+	u.frameSize, u.frameInsets, u.gotFrame, u.frameBg = e.Size, e.Insets, true, bg
+	if !changed && !back {
+		return
+	}
+	what := "FrameEvent"
+	if back {
+		what = "first FrameEvent after ForegroundEvent"
+	}
+	events.add(fmt.Sprintf("%s size=%dx%d insets=%v/%v/%v/%v", what, e.Size.X, e.Size.Y,
+		e.Insets.Top, e.Insets.Bottom, e.Insets.Left, e.Insets.Right))
 }
 
 // config logs the changes of the fields that the pages are about.

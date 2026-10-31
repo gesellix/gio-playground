@@ -40,7 +40,7 @@ Where the patches are:
   `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25). Config.Hidden
   (v2 2/4) is not applied: Elias would rather report the background
   through `app.Events`, so the fork's branch app-background-event has
-  `app.BackgroundEvent` and `app.ForegroundEvent` instead (v4 of 2/4). DecorationColors, which
+  `app.BackgroundEvent` and `app.ForegroundEvent` instead (v5 of 2/4). DecorationColors, which
   Elias turned down in favour of no decorations of Gio's own, and
   Editor.Wipe (not sent yet) stay in the fork. The fork's branch
   pwdmgr-background-event is upstream plus these three.
