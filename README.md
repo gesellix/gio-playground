@@ -39,11 +39,11 @@ Where the patches are:
   Upstream applied iOS 13 as the minimum, the UIScene life cycle and
   `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25), and the patch
   that posts the macOS/iOS wakeup to the main queue (24f37972, 2026-11-01). Config.Hidden
-  (v2 2/4) is not applied: Elias would rather report the background
-  through `app.Events`, so the fork's branch app-background-event has
-  `app.BackgroundEvent` and `app.ForegroundEvent` instead (v6 of 2/4). DecorationColors, which
-  Elias turned down in favour of no decorations of Gio's own, and
-  Editor.Wipe (not sent yet) stay in the fork. The fork's branch
+  (v2 2/4) is not applied: Elias preferred to report the background through
+  `app.Events`, and upstream merged `app.BackgroundEvent` and
+  `app.ForegroundEvent` (ff63fbb7, 2026-11-01). DecorationColors, which Elias
+  turned down in favour of no decorations of Gio's own, and Editor.Wipe and the
+  X11 clipboard refusal (not sent yet) stay in the fork. The fork's branch
   pwdmgr-background-event is upstream plus these three.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).

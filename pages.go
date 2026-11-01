@@ -60,7 +60,7 @@ type lifecyclePage struct {
 
 func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
 func (*lifecyclePage) about() string {
-	return "Gio: app.BackgroundEvent and app.ForegroundEvent on Android and iOS, through app.Events (v6 of 2/4, replaces Config.Hidden)"
+	return "Gio: app.BackgroundEvent and app.ForegroundEvent on Android and iOS, through app.Events (upstream since ff63fbb7)"
 }
 
 func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
