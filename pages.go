@@ -53,6 +53,9 @@ func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 type lifecyclePage struct {
 	second     widget.Clickable
 	invalidate widget.Clickable
+	quiet      widget.Clickable
+	draw       widget.Clickable
+	drawOff    bool
 }
 
 func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
@@ -73,6 +76,16 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		invalidateSync.Store(on)
 		events.add(fmt.Sprintf("Window.Invalidate in the handler: %v", on))
 	}
+	if p.quiet.Clicked(gtx) {
+		on := !quiet.Load()
+		quiet.Store(on)
+		events.add(fmt.Sprintf("Quiet log: %v", on))
+	}
+	if p.draw.Clicked(gtx) && u.f.ForegroundDraw != nil {
+		p.drawOff = !p.drawOff
+		u.f.ForegroundDraw(!p.drawOff)
+		events.add(fmt.Sprintf("Draw on foreground: %v", !p.drawOff))
+	}
 	state := "not in this build"
 	if u.f.Background != nil {
 		switch background.Load() {
@@ -86,6 +99,7 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	}
 	rows := []layout.Widget{
 		u.mono(fmt.Sprintf("Focused=%v Last=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
+		u.mono(fmt.Sprintf("Frame %d, drawn %s", u.frames, u.frameAt.Format("15:04:05.000"))),
 		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows BackgroundEvent, then ForegroundEvent."),
 		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
 		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
@@ -101,6 +115,24 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		rows = append(rows,
 			u.button(&p.invalidate, label),
 			u.text("On: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that posts the wakeup to the main queue, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."),
+		)
+	}
+	quietLabel := "Quiet log: off"
+	if quiet.Load() {
+		quietLabel = "Quiet log: ON"
+	}
+	rows = append(rows,
+		u.button(&p.quiet, quietLabel),
+		u.text("On: log entries don't redraw the window, so a frame after a return is one the platform or Gio asked for. The log shows every frame; it updates on the next frame, so tap something to see it. Compare the time above with the clock: an old time means that no frame was drawn."),
+	)
+	if u.f.ForegroundDraw != nil {
+		label := "Draw on foreground: ON"
+		if p.drawOff {
+			label = "Draw on foreground: off"
+		}
+		rows = append(rows,
+			u.button(&p.draw, label),
+			u.text("Diag build, iOS: off skips gio_onDraw in applicationWillEnterForeground. Use it with the quiet log."),
 		)
 	}
 	if canStartSecondActivity {

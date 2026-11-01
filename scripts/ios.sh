@@ -88,7 +88,7 @@ build() {
 	used=schemes
 	# gogio writes the scene manifest itself, and without -minsdk it
 	# builds for iOS 13 (upstream since c57ee40).
-	if [ "$GIO" = fork ]; then
+	if [ "$GIO" = fork ] || [ "$GIO" = diag ]; then
 		flags+=(-privacymanifest "$root/ios/PrivacyInfo.xcprivacy")
 		used+=,privacymanifest
 	fi

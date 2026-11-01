@@ -5,6 +5,7 @@ import (
 	"image"
 	"runtime"
 	"strings"
+	"time"
 
 	"gioui.org/app"
 	"gioui.org/font/gofont"
@@ -56,6 +57,10 @@ type ui struct {
 	frameInsets app.Insets
 	gotFrame    bool
 	frameFg     int32
+	// The number and time of the frames, shown on the Background page: an
+	// old time after a return means that no new frame was drawn.
+	frames  int
+	frameAt time.Time
 }
 
 func newUI(w *app.Window, f Features) *ui {
@@ -105,11 +110,13 @@ func (u *ui) run() error {
 // after a ForegroundEvent in any case: whether a size seen while in the
 // background arrives with the program's return (the rotation test).
 func (u *ui) frame(e app.FrameEvent) {
+	u.frames++
+	u.frameAt = e.Now
 	fg := foregrounds.Load()
 	back := u.gotFrame && fg != u.frameFg
 	changed := !u.gotFrame || e.Size != u.frameSize || e.Insets != u.frameInsets
 	u.frameSize, u.frameInsets, u.gotFrame, u.frameFg = e.Size, e.Insets, true, fg
-	if !changed && !back {
+	if !changed && !back && !quiet.Load() {
 		return
 	}
 	what := "FrameEvent"

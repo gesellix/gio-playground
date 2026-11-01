@@ -40,6 +40,12 @@ type Features struct {
 	Wipe func(*widget.Editor)
 	// SaveFilePath calls explorer.Explorer.SaveFilePath.
 	SaveFilePath func(x *explorer.Explorer, name string) (string, error)
+	// ForegroundDraw turns the draw on returning to the foreground on or off
+	// (iOS, the diag build only).
+	ForegroundDraw func(on bool)
+	// Trace sets the function that gets what the driver does around the
+	// return to the foreground (iOS, the diag build only).
+	Trace func(f func(string))
 }
 
 // The scripts set these with -ldflags "-X ...".
@@ -57,6 +63,15 @@ func Run(f Features) {
 		events.add("no URL scheme registered: started without an app bundle (go run), see the page URLs and iOS scenes")
 	}
 	initPlatform()
+	if f.Trace != nil {
+		// Only in quiet mode: without it each entry asks for a frame, and
+		// each frame adds an entry.
+		f.Trace(func(s string) {
+			if quiet.Load() {
+				events.add("gio: " + s)
+			}
+		})
+	}
 	go func() {
 		w := new(app.Window)
 		mainWindow.Store(w)

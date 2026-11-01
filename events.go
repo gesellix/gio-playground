@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -12,6 +13,11 @@ import (
 // event loop, from app.Events and from platform callbacks, so it is safe
 // for concurrent use.
 var events eventLog
+
+// quiet is the switch of the Background page: entries don't redraw the
+// window. Otherwise the entry of a ForegroundEvent itself asks for a frame,
+// which hides whether the platform or Gio would have asked for one.
+var quiet atomic.Bool
 
 type eventLog struct {
 	mu      sync.Mutex
@@ -29,7 +35,7 @@ func (l *eventLog) add(s string) {
 	if l.start.IsZero() {
 		l.start = now
 	}
-	e := fmt.Sprintf("%s +%.1fs %s", now.Format("15:04:05"), now.Sub(l.start).Seconds(), s)
+	e := fmt.Sprintf("%s +%.3fs %s", now.Format("15:04:05"), now.Sub(l.start).Seconds(), s)
 	l.entries = append(l.entries, e)
 	if len(l.entries) > maxEntries {
 		l.entries = l.entries[len(l.entries)-maxEntries:]
@@ -38,7 +44,7 @@ func (l *eventLog) add(s string) {
 	l.mu.Unlock()
 	// Also on stdout: adb logcat, the Xcode console, the terminal.
 	log.Print(s)
-	if changed != nil {
+	if changed != nil && !quiet.Load() {
 		// Never from the caller's thread: entries also come from callbacks
 		// on the main thread (UIKit notifications, URLs), and there
 		// Window.Invalidate wakes the window synchronously, delivering

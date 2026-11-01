@@ -29,15 +29,16 @@ fi
 : "${URL_SCHEME:=gioplayground}"
 
 case $GIO in
-fork | upstream | platformdir) ;;
+fork | upstream | platformdir | diag) ;;
 *)
-	echo "GIO is fork, upstream or platformdir, not $GIO" >&2
+	echo "GIO is fork, upstream, platformdir or diag, not $GIO" >&2
 	exit 2
 	;;
 esac
 
-# The module of the build: fork (with the patches), upstream, or
-# platformdir (the fork's Gio, with the gogio of -platformdir).
+# The module of the build: fork (with the patches), upstream, platformdir
+# (the fork's Gio, with the gogio of -platformdir), or diag (the fork's Gio
+# with a test switch and trace for the draw on foreground on iOS).
 moddir=$root/$GIO
 mkdir -p "$root/build"
 
