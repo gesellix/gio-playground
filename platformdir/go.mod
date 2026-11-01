@@ -39,10 +39,10 @@ replace github.com/gesellix/gio-playground => ../
 // UIScene life cycle and clipboard Sensitive from v2 of the Gio series
 // (gio-patches 72119) and the patch that posts the macOS/iOS wakeup to the
 // main queue also from the main thread, plus app.BackgroundEvent and
-// ForegroundEvent (v5 of 2/4, which replaces Config.Hidden), DecorationColors
+// ForegroundEvent (v6 of 2/4, which replaces Config.Hidden), DecorationColors
 // (dropped from the series) and Editor.Wipe, the fork's branch
 // pwdmgr-background-event (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261101111600-e0272ad6838f
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261101122951-2bfba7f08441
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).

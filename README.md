@@ -41,7 +41,7 @@ Where the patches are:
   that posts the macOS/iOS wakeup to the main queue (24f37972, 2026-11-01). Config.Hidden
   (v2 2/4) is not applied: Elias would rather report the background
   through `app.Events`, so the fork's branch app-background-event has
-  `app.BackgroundEvent` and `app.ForegroundEvent` instead (v5 of 2/4). DecorationColors, which
+  `app.BackgroundEvent` and `app.ForegroundEvent` instead (v6 of 2/4). DecorationColors, which
   Elias turned down in favour of no decorations of Gio's own, and
   Editor.Wipe (not sent yet) stay in the fork. The fork's branch
   pwdmgr-background-event is upstream plus these three.
