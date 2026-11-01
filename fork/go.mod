@@ -3,7 +3,7 @@ module github.com/gesellix/gio-playground/fork
 go 1.27.3
 
 require (
-	gioui.org v0.10.4-0.20261026070653-20998f2d0b4a
+	gioui.org v0.10.4-0.20261101063832-24f37972e983
 	gioui.org/x v0.10.3
 	github.com/gesellix/gio-playground v0.0.0
 )
@@ -28,14 +28,14 @@ require (
 
 replace github.com/gesellix/gio-playground => ../
 
-// gioui.org: upstream main 20998f2d (2026-10-25), which has iOS 13, the
+// gioui.org: upstream main 24f37972 (2026-11-01), which has iOS 13, the
 // UIScene life cycle and clipboard Sensitive from v2 of the Gio series
-// (gio-patches 72119), plus app.BackgroundEvent and ForegroundEvent (v5 of
-// 2/4, which replaces Config.Hidden), the patch that posts the macOS/iOS
-// wakeup to the main queue also from the main thread, DecorationColors (dropped from the
-// series) and Editor.Wipe, the fork's branch pwdmgr-background-event
-// (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261031200540-5ad33b0f6d95
+// (gio-patches 72119) and the patch that posts the macOS/iOS wakeup to the
+// main queue also from the main thread, plus app.BackgroundEvent and
+// ForegroundEvent (v5 of 2/4, which replaces Config.Hidden), DecorationColors
+// (dropped from the series) and Editor.Wipe, the fork's branch
+// pwdmgr-background-event (github.com/gesellix/gio-forked).
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261101111600-e0272ad6838f
 
 // gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
 // (gio-patches 72104).

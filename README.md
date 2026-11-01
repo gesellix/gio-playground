@@ -37,7 +37,8 @@ Where the patches are:
   and, after the review, as v2
   ([gio-patches 72119](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72119)).
   Upstream applied iOS 13 as the minimum, the UIScene life cycle and
-  `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25). Config.Hidden
+  `clipboard.WriteCmd.Sensitive` (20998f2d, 2026-10-25), and the patch
+  that posts the macOS/iOS wakeup to the main queue (24f37972, 2026-11-01). Config.Hidden
   (v2 2/4) is not applied: Elias would rather report the background
   through `app.Events`, so the fork's branch app-background-event has
   `app.BackgroundEvent` and `app.ForegroundEvent` instead (v5 of 2/4). DecorationColors, which
