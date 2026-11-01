@@ -7,3 +7,7 @@ const canDisconnectScene = false
 func initPlatform() {}
 
 func disconnectScene() {}
+
+func presentSecondView() {}
+
+func closeSecondView() {}

@@ -43,6 +43,7 @@ func (l *eventLog) add(s string) {
 	changed := l.changed
 	l.mu.Unlock()
 	returns.add(now, s)
+	writeLogFile(now, s)
 	// Also on stdout: adb logcat, the Xcode console, the terminal.
 	log.Print(s)
 	if changed != nil && !quiet.Load() {

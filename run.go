@@ -42,11 +42,11 @@ type Features struct {
 	Wipe func(*widget.Editor)
 	// SaveFilePath calls explorer.Explorer.SaveFilePath.
 	SaveFilePath func(x *explorer.Explorer, name string) (string, error)
-	// ForegroundDraw turns the draw on returning to the foreground on or off
-	// (iOS, the diag build only).
-	ForegroundDraw func(on bool)
-	// Trace sets the function that gets what the driver does around the
-	// return to the foreground (iOS, the diag build only).
+	// BackgroundDraw turns drawing in the background on or off (iOS, the diag
+	// build only).
+	BackgroundDraw func(on bool)
+	// Trace sets the function that gets what the driver does (iOS, the diag
+	// build only). Lines that start with "raw:" also go to the event log.
 	Trace func(f func(string))
 }
 
@@ -68,7 +68,14 @@ func Run(f Features) {
 	if f.Trace != nil {
 		// The diag build is for the test that needs the quiet log.
 		quiet.Store(true)
-		f.Trace(func(s string) { returns.add(time.Now(), "gio: "+s) })
+		openLogFile()
+		f.Trace(func(s string) {
+			if strings.HasPrefix(s, "raw:") {
+				events.add("gio " + s)
+				return
+			}
+			detail("gio: " + s)
+		})
 	}
 	go func() {
 		w := new(app.Window)
@@ -86,6 +93,9 @@ func Run(f Features) {
 	app.Events(func(e event.Event) bool {
 		if u, ok := e.(app.URLEvent); ok {
 			events.add("URLEvent " + u.URL.String())
+			if u.URL.Host == "diag" && f.Trace != nil {
+				f.diagCommand(u.URL.Query())
+			}
 		}
 		if f.Background != nil {
 			if s, ok := f.Background(e); ok {
@@ -113,8 +123,8 @@ func Run(f Features) {
 // switches says how the test of the Background page is set up.
 func (f Features) switches() string {
 	s := fmt.Sprintf("quiet log: %v, Invalidate in the handler: %v", quiet.Load(), invalidateSync.Load())
-	if f.ForegroundDraw != nil {
-		s += fmt.Sprintf(", draw on foreground: %v", !foregroundDrawOff.Load())
+	if f.BackgroundDraw != nil {
+		s += fmt.Sprintf(", draw in the background: %v", backgroundDrawOn.Load())
 	}
 	return s
 }
@@ -158,8 +168,8 @@ func invalidateInHandler() {
 	events.add("Window.Invalidate returned")
 }
 
-// foregroundDrawOff is the switch of the Background page in the diag build.
-var foregroundDrawOff atomic.Bool
+// backgroundDrawOn is the switch of the Background page in the diag build.
+var backgroundDrawOn atomic.Bool
 
 // foregrounds counts the ForegroundEvents, so that the window can tell its
 // first frame after one.

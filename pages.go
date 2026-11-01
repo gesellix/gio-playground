@@ -81,11 +81,11 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		quiet.Store(on)
 		events.add(fmt.Sprintf("Quiet log: %v", on))
 	}
-	if p.draw.Clicked(gtx) && u.f.ForegroundDraw != nil {
-		off := !foregroundDrawOff.Load()
-		foregroundDrawOff.Store(off)
-		u.f.ForegroundDraw(!off)
-		events.add(fmt.Sprintf("Draw on foreground: %v", !off))
+	if p.draw.Clicked(gtx) && u.f.BackgroundDraw != nil {
+		on := !backgroundDrawOn.Load()
+		backgroundDrawOn.Store(on)
+		u.f.BackgroundDraw(on)
+		events.add(fmt.Sprintf("Draw in the background: %v", on))
 	}
 	if p.copyTrip.Clicked(gtx) {
 		gtx.Execute(u.f.clipboardWrite(strings.Join(returns.text(), "\n")+"\n", false))
@@ -111,10 +111,10 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		quietLabel = "Quiet log: ON"
 	}
 	rows = append(rows, u.button(&p.quiet, quietLabel))
-	if u.f.ForegroundDraw != nil {
-		label := "Draw on foreground: ON"
-		if foregroundDrawOff.Load() {
-			label = "Draw on foreground: off"
+	if u.f.BackgroundDraw != nil {
+		label := "Draw in the background: off"
+		if backgroundDrawOn.Load() {
+			label = "Draw in the background: ON"
 		}
 		rows = append(rows, u.button(&p.draw, label))
 	}
@@ -143,8 +143,8 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		u.text("Rotation (iOS): leave the app, turn the phone in another app that rotates (Safari, Photos), come back. The log shows the frame size before leaving and the first FrameEvent after ForegroundEvent: it should have the new size."),
 		u.text("Quiet log, on: log entries don't redraw the window, so a frame after a return is one the platform or Gio asked for. An old time in the \"Frame\" line means that no frame was drawn, so read it before you touch the screen. The last trip keeps every frame up to 3 s after the ForegroundEvent; wait that long before you tap, then tap to see it."),
 	)
-	if u.f.ForegroundDraw != nil {
-		rows = append(rows, u.text("Draw on foreground, diag build, iOS: off skips gio_onDraw in applicationWillEnterForeground. Use it with the quiet log, which is on by default in this build."))
+	if u.f.BackgroundDraw != nil {
+		rows = append(rows, u.text("Draw in the background, diag build, iOS: on lets draw() go on while the program is in the background, to see what Metal does. The quiet log is on by default in this build."))
 	}
 	if u.f.Background != nil {
 		rows = append(rows, u.text("Window.Invalidate in the handler, on: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that posts the wakeup to the main queue, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."))

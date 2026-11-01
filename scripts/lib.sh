@@ -38,7 +38,7 @@ esac
 
 # The module of the build: fork (with the patches), upstream, platformdir
 # (the fork's Gio, with the gogio of -platformdir), or diag (the fork's Gio
-# with a test switch and trace for the draw on foreground on iOS).
+# with a trace of the iOS driver, see scripts/ios-background-test.sh).
 moddir=$root/$GIO
 mkdir -p "$root/build"
 

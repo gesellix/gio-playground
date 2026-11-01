@@ -124,7 +124,7 @@ func (u *ui) frame(e app.FrameEvent) {
 		e.Insets.Top, e.Insets.Bottom, e.Insets.Left, e.Insets.Right)
 	if !changed && !back {
 		// Not for the log: a blinking caret would fill it.
-		returns.add(time.Now(), line)
+		detail(line)
 		return
 	}
 	events.add(line)

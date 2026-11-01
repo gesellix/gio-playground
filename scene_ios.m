@@ -63,3 +63,39 @@ char *infoString(const char *key) {
 int hasResource(const char *name, const char *ext) {
 	return [NSBundle.mainBundle pathForResource:@(name) ofType:@(ext)] != nil;
 }
+
+@interface GioViewController : UIViewController
+@end
+
+static UIViewController *rootController(void) {
+	for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+		if ([scene isKindOfClass:[UIWindowScene class]]) {
+			for (UIWindow *w in ((UIWindowScene *)scene).windows) {
+				if (w.rootViewController != nil) {
+					return w.rootViewController;
+				}
+			}
+		}
+	}
+	return nil;
+}
+
+void presentGioView(void) {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		UIViewController *root = rootController();
+		if (root == nil) {
+			report(@"no root view controller for a second view");
+			return;
+		}
+		UIViewController *vc = [[GioViewController alloc] init];
+		[root presentViewController:vc animated:NO completion:^{
+			report([NSString stringWithFormat:@"second view controller presented: %p", vc]);
+		}];
+	});
+}
+
+void dismissGioView(void) {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[rootController() dismissViewControllerAnimated:NO completion:nil];
+	});
+}

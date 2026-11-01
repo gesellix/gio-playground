@@ -10,6 +10,8 @@ package playground
 
 void observeScenes(void);
 void disconnectScenes(void);
+void presentGioView(void);
+void dismissGioView(void);
 int hasInfoKey(const char *key);
 char *infoString(const char *key);
 int hasResource(const char *name, const char *ext);
@@ -40,6 +42,10 @@ func initPlatform() {
 // disconnectScene asks UIKit to destroy the session of every connected
 // scene, which disconnects it. Opening the app again connects a new one.
 func disconnectScene() { C.disconnectScenes() }
+
+func presentSecondView() { C.presentGioView() }
+
+func closeSecondView() { C.dismissGioView() }
 
 //export playgroundSceneEvent
 func playgroundSceneEvent(s *C.char) {

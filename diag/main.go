@@ -1,6 +1,5 @@
-// The fork's program with a test switch and trace for the draw when the
-// program returns to the foreground on iOS (see go.mod and the Gio branch
-// diag-foreground-draw). Test only.
+// The fork's program with a trace of the iOS driver and a switch to draw in the
+// background (see go.mod and the Gio branch diag-background-state). Test only.
 package main
 
 import (
@@ -35,7 +34,7 @@ func main() {
 		SaveFilePath: func(x *explorer.Explorer, name string) (string, error) {
 			return x.SaveFilePath(name)
 		},
-		ForegroundDraw: app.DiagForegroundDraw.Store,
-		Trace:          func(f func(string)) { app.DiagTrace.Store(&f) },
+		BackgroundDraw: app.DiagDrawInBackground.Store,
+		Trace:          app.DiagSetTrace,
 	})
 }

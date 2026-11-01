@@ -97,7 +97,8 @@ scripts/ios.sh                     # build, install, start
 scripts/windows.sh                 # build the .exe (copy it to Windows)
 GIO=upstream scripts/android.sh    # the same with upstream as it is
 GIO=platformdir scripts/ios.sh     # with complete platform files
-GIO=diag scripts/ios.sh            # the draw on foreground as a switch
+GIO=diag scripts/ios.sh            # a trace of the iOS driver, driven by URLs
+scripts/ios-background-test.sh     # runs the background tests with that build
 ```
 
 With `GIO=platformdir` gogio gets `-platformdir` instead of `-schemes`,
