@@ -116,15 +116,18 @@ func (u *ui) frame(e app.FrameEvent) {
 	back := u.gotFrame && fg != u.frameFg
 	changed := !u.gotFrame || e.Size != u.frameSize || e.Insets != u.frameInsets
 	u.frameSize, u.frameInsets, u.gotFrame, u.frameFg = e.Size, e.Insets, true, fg
-	if !changed && !back && !quiet.Load() {
-		return
-	}
 	what := "FrameEvent"
 	if back {
 		what = "first FrameEvent after ForegroundEvent"
 	}
-	events.add(fmt.Sprintf("%s size=%dx%d insets=%v/%v/%v/%v", what, e.Size.X, e.Size.Y,
-		e.Insets.Top, e.Insets.Bottom, e.Insets.Left, e.Insets.Right))
+	line := fmt.Sprintf("%s size=%dx%d insets=%v/%v/%v/%v", what, e.Size.X, e.Size.Y,
+		e.Insets.Top, e.Insets.Bottom, e.Insets.Left, e.Insets.Right)
+	if !changed && !back {
+		// Not for the log: a blinking caret would fill it.
+		returns.add(time.Now(), line)
+		return
+	}
+	events.add(line)
 }
 
 // config logs the changes of the fields that the pages are about.

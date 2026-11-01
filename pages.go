@@ -55,7 +55,7 @@ type lifecyclePage struct {
 	invalidate widget.Clickable
 	quiet      widget.Clickable
 	draw       widget.Clickable
-	drawOff    bool
+	copyTrip   widget.Clickable
 }
 
 func (*lifecyclePage) title() string { return "Background: BackgroundEvent, ForegroundEvent" }
@@ -82,9 +82,14 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		events.add(fmt.Sprintf("Quiet log: %v", on))
 	}
 	if p.draw.Clicked(gtx) && u.f.ForegroundDraw != nil {
-		p.drawOff = !p.drawOff
-		u.f.ForegroundDraw(!p.drawOff)
-		events.add(fmt.Sprintf("Draw on foreground: %v", !p.drawOff))
+		off := !foregroundDrawOff.Load()
+		foregroundDrawOff.Store(off)
+		u.f.ForegroundDraw(!off)
+		events.add(fmt.Sprintf("Draw on foreground: %v", !off))
+	}
+	if p.copyTrip.Clicked(gtx) {
+		gtx.Execute(u.f.clipboardWrite(strings.Join(returns.text(), "\n")+"\n", false))
+		events.add("last trip copied to the clipboard")
 	}
 	state := "not in this build"
 	if u.f.Background != nil {
@@ -100,40 +105,49 @@ func (p *lifecyclePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	rows := []layout.Widget{
 		u.mono(fmt.Sprintf("Focused=%v Last=%s Mode=%v", u.cfg.Focused, state, u.cfg.Mode)),
 		u.mono(fmt.Sprintf("Frame %d, drawn %s", u.frames, u.frameAt.Format("15:04:05.000"))),
-		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows BackgroundEvent, then ForegroundEvent."),
-		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
-		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
-		u.text("Android: the document picker (Files page) belongs to another app, so it reports BackgroundEvent."),
-		u.text("On the desktop neither event comes."),
-		u.text("Rotation (iOS): leave the app, turn the phone in another app that rotates (Safari, Photos), come back. The log shows the frame size before leaving and the first FrameEvent after ForegroundEvent: it should have the new size."),
+	}
+	quietLabel := "Quiet log: off"
+	if quiet.Load() {
+		quietLabel = "Quiet log: ON"
+	}
+	rows = append(rows, u.button(&p.quiet, quietLabel))
+	if u.f.ForegroundDraw != nil {
+		label := "Draw on foreground: ON"
+		if foregroundDrawOff.Load() {
+			label = "Draw on foreground: off"
+		}
+		rows = append(rows, u.button(&p.draw, label))
 	}
 	if u.f.Background != nil {
 		label := "Window.Invalidate in the handler: off"
 		if invalidateSync.Load() {
 			label = "Window.Invalidate in the handler: ON"
 		}
-		rows = append(rows,
-			u.button(&p.invalidate, label),
-			u.text("On: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that posts the wakeup to the main queue, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."),
-		)
+		rows = append(rows, u.button(&p.invalidate, label))
 	}
-	quietLabel := "Quiet log: off"
-	if quiet.Load() {
-		quietLabel = "Quiet log: ON"
+	if trip := returns.text(); len(trip) > 0 {
+		rows = append(rows,
+			material.Subtitle2(u.th, "Last trip to the background").Layout,
+			u.button(&p.copyTrip, "Copy the last trip"),
+		)
+		for _, l := range trip {
+			rows = append(rows, u.mono(l))
+		}
 	}
 	rows = append(rows,
-		u.button(&p.quiet, quietLabel),
-		u.text("On: log entries don't redraw the window, so a frame after a return is one the platform or Gio asked for. The log shows every frame; it updates on the next frame, so tap something to see it. Compare the time above with the clock: an old time means that no frame was drawn."),
+		u.text("Leave the app (home, app switcher, screen off) and come back: the log shows BackgroundEvent, then ForegroundEvent."),
+		u.text("Open the notification shade, the Control Center or a system dialog: only Focused changes."),
+		u.text("Android: switch dark mode on or off (the activity is re-created): no event."),
+		u.text("Android: the document picker (Files page) belongs to another app, so it reports BackgroundEvent."),
+		u.text("On the desktop neither event comes."),
+		u.text("Rotation (iOS): leave the app, turn the phone in another app that rotates (Safari, Photos), come back. The log shows the frame size before leaving and the first FrameEvent after ForegroundEvent: it should have the new size."),
+		u.text("Quiet log, on: log entries don't redraw the window, so a frame after a return is one the platform or Gio asked for. An old time in the \"Frame\" line means that no frame was drawn, so read it before you touch the screen. The last trip keeps every frame up to 3 s after the ForegroundEvent; wait that long before you tap, then tap to see it."),
 	)
 	if u.f.ForegroundDraw != nil {
-		label := "Draw on foreground: ON"
-		if p.drawOff {
-			label = "Draw on foreground: off"
-		}
-		rows = append(rows,
-			u.button(&p.draw, label),
-			u.text("Diag build, iOS: off skips gio_onDraw in applicationWillEnterForeground. Use it with the quiet log."),
-		)
+		rows = append(rows, u.text("Draw on foreground, diag build, iOS: off skips gio_onDraw in applicationWillEnterForeground. Use it with the quiet log, which is on by default in this build."))
+	}
+	if u.f.Background != nil {
+		rows = append(rows, u.text("Window.Invalidate in the handler, on: the BackgroundEvent and ForegroundEvent handler calls Window.Invalidate itself, on the main thread. Without the Gio patch that posts the wakeup to the main queue, leaving the app hangs it (iOS: the watchdog ends it after about ten seconds; the log has no \"returned\" line). With the patch the log shows \"Window.Invalidate returned\"."))
 	}
 	if canStartSecondActivity {
 		rows = append(rows,

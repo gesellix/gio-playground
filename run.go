@@ -10,12 +10,14 @@
 package playground
 
 import (
+	"fmt"
 	"image/color"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"gioui.org/app"
 	"gioui.org/io/clipboard"
@@ -64,13 +66,9 @@ func Run(f Features) {
 	}
 	initPlatform()
 	if f.Trace != nil {
-		// Only in quiet mode: without it each entry asks for a frame, and
-		// each frame adds an entry.
-		f.Trace(func(s string) {
-			if quiet.Load() {
-				events.add("gio: " + s)
-			}
-		})
+		// The diag build is for the test that needs the quiet log.
+		quiet.Store(true)
+		f.Trace(func(s string) { returns.add(time.Now(), "gio: "+s) })
 	}
 	go func() {
 		w := new(app.Window)
@@ -91,6 +89,11 @@ func Run(f Features) {
 		}
 		if f.Background != nil {
 			if s, ok := f.Background(e); ok {
+				if s {
+					returns.left(f.switches())
+				} else {
+					returns.back(time.Now())
+				}
 				background.Store(int32(backgroundOf(s)))
 				invalidateInHandler()
 				if !s {
@@ -105,6 +108,15 @@ func Run(f Features) {
 		}
 		return true
 	})
+}
+
+// switches says how the test of the Background page is set up.
+func (f Features) switches() string {
+	s := fmt.Sprintf("quiet log: %v, Invalidate in the handler: %v", quiet.Load(), invalidateSync.Load())
+	if f.ForegroundDraw != nil {
+		s += fmt.Sprintf(", draw on foreground: %v", !foregroundDrawOff.Load())
+	}
+	return s
 }
 
 func (f Features) clipboardWrite(text string, sensitive bool) clipboard.WriteCmd {
@@ -145,6 +157,9 @@ func invalidateInHandler() {
 	w.Invalidate()
 	events.add("Window.Invalidate returned")
 }
+
+// foregroundDrawOff is the switch of the Background page in the diag build.
+var foregroundDrawOff atomic.Bool
 
 // foregrounds counts the ForegroundEvents, so that the window can tell its
 // first frame after one.
