@@ -47,6 +47,8 @@ Where the patches are:
   pwdmgr-background-event is upstream plus these three.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
+  The two Android patches are upstream (`ad1ee9c`, `77d3e1d`); `explorer.SaveFilePath`
+  stays in the fork, on branch `explorer-save-path-rebased`.
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as
   [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106)
   (`-plist`, `-privacymanifest`, `-manifest`; turned down for complete
