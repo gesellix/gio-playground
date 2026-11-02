@@ -35,9 +35,9 @@ replace github.com/gesellix/gio-playground => ../
 // pwdmgr-background-event (github.com/gesellix/gio-forked).
 replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261101183802-8f3f0c3e1669
 
-// gioui.org/x v0.10.3 plus the explorer patches, as sent upstream
-// (gio-patches 72104).
-replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261024101701-d143eccbdf2c
+// gioui.org/x upstream main, which has our two Android patches, plus
+// explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).
+replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261102213852-91215c32f22b
 
 // gioui.org/cmd (gogio, run as 'go tool gogio') upstream c57ee40, which has
 // the scene manifest with iOS 13 as the default -minsdk, plus -plist,
