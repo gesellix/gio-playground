@@ -59,6 +59,23 @@ Where the patches are:
   suggested (Info_ios.plist, with Info.plist as the fallback), and on
   Windows with a ready resource object (rsrc_windows_<arch>.syso).
 
+## Flatpak test
+
+Does `SaveFilePath` plus a temporary file and rename work for a real Flatpak
+app going through the dialog? The manifest `flatpak/` gives the app no access
+to your files, so it only reaches what the dialog grants.
+
+`scripts/flatpak.sh` builds the fork's program in Docker, installs the bundle
+for this user and runs it, with the log on the terminal and in
+`build/flatpak-test.log`. The host needs Docker and flatpak, not flatpak-builder
+or the SDK. On the
+page "Files: export and save": `SaveFilePath` for a new name and to replace a
+file, cancel, "List the folder of the remembered path". Then close the app,
+run `flatpak run org.example.gioplayground 2>&1 | tee -a build/flatpak-test.log`,
+and "Save again to the remembered path". Remove it with `flatpak uninstall --user org.example.gioplayground`, and the
+build's image and volumes with `docker rmi gioplayground-flatpak` and
+`docker volume rm gioplayground-flatpak-data gioplayground-flatpak-work`.
+
 ## Layout
 
 - The root package (`playground`) is the program. It builds against
@@ -97,6 +114,7 @@ scripts/android.sh                 # build, install (keeps data), start
 scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
 scripts/windows.sh                 # build the .exe (copy it to Windows)
+scripts/flatpak.sh                 # Linux: build and install as a Flatpak, then run it
 GIO=upstream scripts/android.sh    # the same with upstream as it is
 GIO=platformdir scripts/ios.sh     # with complete platform files
 GIO=diag scripts/ios.sh            # a trace of the iOS driver, driven by URLs

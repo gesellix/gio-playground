@@ -267,7 +267,7 @@ func (p *wipePage) layout(u *ui, gtx layout.Context) []layout.Widget {
 }
 
 type filesPage struct {
-	exportUnknown, exportText, savePath widget.Clickable
+	exportUnknown, exportText, savePath, saveAgain, listFolder widget.Clickable
 }
 
 func (*filesPage) title() string { return "Files: export and save" }
@@ -285,6 +285,12 @@ func (p *filesPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 	if p.savePath.Clicked(gtx) {
 		go saveViaPath(u, "playground.txt")
 	}
+	if p.saveAgain.Clicked(gtx) {
+		go saveAgain()
+	}
+	if p.listFolder.Clicked(gtx) {
+		go logFolder()
+	}
 	return []layout.Widget{
 		u.button(&p.exportUnknown, "CreateFile: unknown extension"),
 		u.text("An extension that Android's MimeTypeMap does not know. Without the fix, no app matches the intent and the result is ErrUserDecline as if cancelled."),
@@ -292,6 +298,10 @@ func (p *filesPage) layout(u *ui, gtx layout.Context) []layout.Widget {
 		u.text("On Android the log shows the URI and name of the created file."),
 		u.button(&p.savePath, "SaveFilePath"),
 		u.text("Desktop only: the dialog returns a path, the file is written to a temporary file and renamed. An existing file stays intact until then, also on cancel."),
+		u.button(&p.saveAgain, "Save again to the remembered path"),
+		u.text("Without the dialog, to the path SaveFilePath returned last, also from before a restart."),
+		u.button(&p.listFolder, "List the folder of the remembered path"),
+		u.text("What the program can see there. In a Flatpak it should not see your other files."),
 	}
 }
 
@@ -332,12 +342,30 @@ func saveViaPath(u *ui, name string) {
 		}
 		return
 	}
-	tmp := path + ".tmp"
-	err = os.WriteFile(tmp, []byte(fileContent()), 0o644)
-	if err == nil {
-		err = os.Rename(tmp, path)
+	events.add(fmt.Sprintf("SaveFilePath: %q", path))
+	if err := rememberPath(path); err != nil {
+		events.add(fmt.Sprintf("remember the path: %v", err))
 	}
-	events.add(fmt.Sprintf("SaveFilePath: %q, write and rename: %v", path, err))
+	events.add(fmt.Sprintf("write and rename: %v", saveReplacing(path, fileContent(), events.add)))
+}
+
+func saveAgain() {
+	path, err := rememberedPath()
+	if err != nil {
+		events.add(fmt.Sprintf("no remembered path: %v", err))
+		return
+	}
+	events.add(fmt.Sprintf("save again to %q", path))
+	events.add(fmt.Sprintf("write and rename: %v", saveReplacing(path, fileContent(), events.add)))
+}
+
+func logFolder() {
+	path, err := rememberedPath()
+	if err != nil {
+		events.add(fmt.Sprintf("no remembered path: %v", err))
+		return
+	}
+	events.add(fmt.Sprintf("folder of %q: %s", path, listFolder(path)))
 }
 
 type logPage struct {

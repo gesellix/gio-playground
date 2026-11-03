@@ -1,0 +1,36 @@
+# The playground as a real Flatpak, to test the file dialog in the sandbox:
+# scripts/flatpak.sh. No --filesystem on purpose: the app must only reach what
+# the dialog grants it.
+app-id: org.example.gioplayground
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+command: gioplayground
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+modules:
+  - name: gioplayground
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/golang/bin
+      # Go modules and, if go.mod asks for a newer Go, its toolchain.
+      build-args:
+        - --share=network
+      env:
+        GOTOOLCHAIN: auto
+        GOPATH: /run/build/gioplayground/.gopath
+        GOCACHE: /run/build/gioplayground/.gocache
+    build-commands:
+      - cd fork && go build -o /app/bin/gioplayground .
+    sources:
+      - type: dir
+        path: ..
+        skip:
+          - .git
+          - .idea
+          - build
