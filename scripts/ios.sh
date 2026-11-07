@@ -11,8 +11,8 @@
 # renews it. simulator needs no Apple account: it builds the app for the
 # simulator (x86_64, the only simulator architecture gogio builds, so an
 # Intel Mac; on Apple silicon it would need Rosetta, not tried), starts it
-# in IOS_SIMULATOR (default: the first available iPhone), opens a URL and
-# checks the log.
+# in IOS_SIMULATOR (default: the first available iPhone) and checks the
+# log.
 . "$(dirname "$0")/lib.sh"
 
 ipa=$root/build/$APP_NAME-$GIO.ipa
@@ -125,9 +125,11 @@ simbuild() {
 
 # simulator runs the simulator build with PLAYGROUND_LOG=1, so the log goes
 # to Documents/playground.log in the app's data container, and checks it.
+# The simulator boots while gogio builds, which takes about as long. No URL:
+# for one from simctl openurl iOS asks "Open in ...?", and nobody answers
+# that without a person (a screenshot of the CI run showed it); Android,
+# macOS and Windows check the URL, and here the scene manifest it needs.
 simulator() {
-	simbuild
-	"$root/scripts/check-build.sh" "$simapp" "$GIO"
 	local sim=${IOS_SIMULATOR:-}
 	if [ -z "$sim" ]; then
 		sim=$(xcrun simctl list devices available -j | python3 -c '
@@ -139,7 +141,11 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
 sys.exit("no available iPhone simulator")')
 	fi
 	echo "simulator $sim"
-	xcrun simctl boot "$sim" 2>/dev/null || true
+	xcrun simctl boot "$sim" 2>/dev/null &
+	local boot=$!
+	simbuild
+	"$root/scripts/check-build.sh" "$simapp" "$GIO"
+	wait "$boot" || true
 	xcrun simctl bootstatus "$sim" -b >/dev/null
 	xcrun simctl uninstall "$sim" "$APP_ID" 2>/dev/null || true
 	xcrun simctl install "$sim" "$simapp"
@@ -147,25 +153,19 @@ sys.exit("no available iPhone simulator")')
 	local data
 	data=$(xcrun simctl get_app_container "$sim" "$APP_ID" data)
 	local log=$data/Documents/playground.log
-	local plist=yes
-	completefiles || plist=no
 	local version=15.0 privacy=yes
-	if [ $plist = no ]; then version=${IOS_MINSDK:-13}.0 privacy=no; fi
+	if ! completefiles; then version=${IOS_MINSDK:-13}.0 privacy=no; fi
+	local ok=0
 	"$root/scripts/check-log.sh" "$log" "$GIO" \
 		"Info.plist has UIApplicationSceneManifest: yes" \
 		"Info.plist MinimumOSVersion: $version" \
 		"bundle has PrivacyInfo.xcprivacy: $privacy" \
-		"UIScene: "
-	xcrun simctl openurl "$sim" "$URL_SCHEME://hello"
-	local ok=0
-	"$root/scripts/check-log.sh" "$log" "$GIO" "URLEvent $URL_SCHEME://hello" || ok=$?
-	cp "$log" "$root/build/$APP_NAME-$GIO-simulator.log"
+		"UIScene: will connect" "UIScene: did activate" || ok=$?
+	cp "$log" "$root/build/$APP_NAME-$GIO-simulator.log" || true
 	if [ $ok != 0 ]; then
-		# What the screen showed instead, for example a question of iOS
-		# before it opens the URL.
 		xcrun simctl io "$sim" screenshot "$root/build/$APP_NAME-$GIO-simulator.png" || true
-		return $ok
 	fi
+	return $ok
 }
 
 start() {
