@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Gio playground
+Comment=Tries out patches to Gio, gio-x and gogio
+Exec=gioplayground
+Icon=@APP_ID@
+Terminal=false
+Categories=Development;
