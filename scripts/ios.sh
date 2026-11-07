@@ -125,10 +125,10 @@ simbuild() {
 
 # simulator runs the simulator build with PLAYGROUND_LOG=1, so the log goes
 # to Documents/playground.log in the app's data container, and checks it.
-# The simulator boots while gogio builds, which takes about as long. No URL:
-# for one from simctl openurl iOS asks "Open in ...?", and nobody answers
-# that without a person (a screenshot of the CI run showed it); Android,
-# macOS and Windows check the URL, and here the scene manifest it needs.
+# No URL: for one from simctl openurl iOS asks "Open in ...?", and nobody
+# answers that without a person (a screenshot of the CI run showed it);
+# Android, macOS and Windows check the URL, and here the scene manifest it
+# needs.
 simulator() {
 	local sim=${IOS_SIMULATOR:-}
 	if [ -z "$sim" ]; then
@@ -141,11 +141,12 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
 sys.exit("no available iPhone simulator")')
 	fi
 	echo "simulator $sim"
-	xcrun simctl boot "$sim" 2>/dev/null &
-	local boot=$!
+	# The build first, then the boot: on the CI runner (Intel, macos-15-intel)
+	# booting while gogio built made the build take 7 min 45 s instead of
+	# about 1 min, and the job 11 min instead of about 5.
 	simbuild
 	"$root/scripts/check-build.sh" "$simapp" "$GIO"
-	wait "$boot" || true
+	xcrun simctl boot "$sim" 2>/dev/null || true
 	xcrun simctl bootstatus "$sim" -b >/dev/null
 	xcrun simctl uninstall "$sim" "$APP_ID" 2>/dev/null || true
 	xcrun simctl install "$sim" "$simapp"
