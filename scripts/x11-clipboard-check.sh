@@ -67,7 +67,14 @@ for mode in sensitive plain; do
 	[ $mode = sensitive ] && text=SENSITIVE-secret-123
 	echo "== $GIO, $mode copy"
 
-	get TARGETS
+	# The log line comes when the copy is asked for; Gio takes the
+	# selection a little later. Until then there is no owner, and xclip
+	# says "not available" for every type, which would pass as a refusal.
+	for _ in $(seq 1 20); do
+		get TARGETS
+		[ "$rc" = 0 ] && break
+		sleep 0.5
+	done
 	targets=$(tr '\n' ' ' <<<"$out")
 	check "TARGETS answers" "$([ "$rc" = 0 ] && [[ $targets == *UTF8_STRING* ]] && echo yes || echo no)" "$targets"
 	get UTF8_STRING
