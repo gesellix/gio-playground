@@ -79,6 +79,39 @@ and "Save again to the remembered path". Remove it with `flatpak uninstall --use
 build's image and volumes with `docker rmi gioplayground-flatpak` and
 `docker volume rm gioplayground-flatpak-data gioplayground-flatpak-work`.
 
+## Linux packages
+
+The fork's program as .deb, .rpm and AppImage, built with only bash and
+Docker, for the architecture of the Docker host (amd64 or arm64):
+
+```sh
+scripts/linux.sh       # build/gioplayground-linux-<arch>
+scripts/deb.sh         # build/gioplayground_2.0.0_<arch>.deb
+scripts/rpm.sh         # build/gioplayground-2.0.0-1.<arch>.rpm
+scripts/appimage.sh    # build/gioplayground-2.0.0-<arch>.AppImage
+scripts/linux-package-test.sh deb    # or rpm, appimage, flatpak
+```
+
+The program is built on Debian 12, so it runs on Ubuntu 24.04 and Fedora 42
+(it needs glibc 2.34 or later; the .deb also needs the library versions of
+Debian 12, `dpkg-shlibdeps` says which). The packages build the
+program first if `build/` does not have it. The test installs a package in a
+clean container (`ubuntu:24.04`, for rpm `fedora:42`, for flatpak `ubuntu:24.04`
+with `--privileged`), starts the program under Xvfb with `PLAYGROUND_LOG` and
+passes when the log has a `FrameEvent` and the program still runs after it;
+it prints what the package brought along and which graphics libraries the
+program loaded.
+
+The dependencies come from the program itself: `dpkg-shlibdeps` for the .deb
+and rpmbuild (sonames) for the .rpm. Gio loads OpenGL ES (`libGLESv2.so.2`)
+and Vulkan (`libvulkan.so.1`) with dlopen, which neither tool sees. Without
+OpenGL ES the window ends right after its first frame ("gl: no OpenGL
+implementation could be loaded"), so it is a dependency (`libgles2`,
+`libglvnd-gles`); Vulkan is recommended (`libvulkan1`, `vulkan-loader`). The
+AppImage bundles no libraries and relies on the system's, as a desktop has
+them: `scripts/appimage.sh` says why. appimagetool and the AppImage runtime
+are pinned releases, checked by sha256.
+
 ## Layout
 
 - The root package (`playground`) is the program. It builds against
@@ -95,8 +128,13 @@ build's image and volumes with `docker rmi gioplayground-flatpak` and
   For Windows, `scripts/windows.sh` first makes `rsrc_windows_<arch>.syso`
   from `winres.json` with go-winres (a tool of the `fork` and `diag`
   modules).
+- `packaging/linux/` has what the Linux packages need: the build image
+  (`Dockerfile`, Debian 12 with Gio's build dependencies), the image of the
+  .rpm (`rpm.Dockerfile`) and its spec, the desktop file and the icon, and
+  `xvfb-test.sh`, which runs in the test containers.
 - `scripts/` builds, installs and starts the app, and holds the checks
-  (see [Checks without a person](#checks-without-a-person-ci)).
+  (see [Checks without a person](#checks-without-a-person-ci)); the Linux
+  package scripts share `scripts/linux-lib.sh`.
 - `.github/workflows/ci.yml` runs the checks.
 
 ## Setup
@@ -119,6 +157,7 @@ scripts/android.sh log             # the app's log
 scripts/ios.sh                     # build, install, start
 scripts/windows.sh                 # build the .exe (copy it to Windows)
 scripts/flatpak.sh                 # Linux: build and install as a Flatpak, then run it
+scripts/deb.sh                     # Linux packages, built in Docker (see Linux packages)
 GIO=upstream scripts/android.sh    # the same with upstream as it is
 GIO=diag scripts/ios.sh            # a trace of the iOS driver, driven by URLs
 scripts/ios-background-test.sh     # runs the background tests with that build
