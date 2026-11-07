@@ -25,14 +25,23 @@ func (*clipboardPage) about() string {
 	return "Gio: clipboard.WriteCmd.Sensitive (upstream since 20998f2d)"
 }
 
-func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
-	if p.sensitive.Clicked(gtx) {
+// copyFor copies the text of the sensitive or the plain button.
+func copyFor(u *ui, gtx layout.Context, sensitive bool) {
+	if sensitive {
 		gtx.Execute(u.f.clipboardWrite("SENSITIVE-secret-123", true))
 		events.add("copied SENSITIVE-secret-123 with Sensitive: true")
+		return
+	}
+	gtx.Execute(u.f.clipboardWrite("PLAIN-text-456", false))
+	events.add("copied PLAIN-text-456 with Sensitive: false")
+}
+
+func (p *clipboardPage) layout(u *ui, gtx layout.Context) []layout.Widget {
+	if p.sensitive.Clicked(gtx) {
+		copyFor(u, gtx, true)
 	}
 	if p.plain.Clicked(gtx) {
-		gtx.Execute(u.f.clipboardWrite("PLAIN-text-456", false))
-		events.add("copied PLAIN-text-456 with Sensitive: false")
+		copyFor(u, gtx, false)
 	}
 	rows := []layout.Widget{
 		u.button(&p.sensitive, "Copy sensitive"),

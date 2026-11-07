@@ -17,21 +17,29 @@ import (
 // and everything it sees also goes to a file that devicectl can copy.
 
 // logFile is Documents/playground.log in the diag build, new for each start of
-// the process.
+// the process. PLAYGROUND_LOG asks for it in every build (see Run).
 var logFile atomic.Pointer[os.File]
 
-func openLogFile() {
-	home, err := os.UserHomeDir()
-	if err != nil {
+// openLogFile creates the log file at path, or at Documents/playground.log in
+// the home directory (on iOS and Android the app's) when path is empty. It
+// does nothing if a log file is already open.
+func openLogFile(path string) {
+	if logFile.Load() != nil {
+		return
+	}
+	if path == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			events.add("no log file: " + err.Error())
+			return
+		}
+		path = filepath.Join(home, "Documents", "playground.log")
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		events.add("no log file: " + err.Error())
 		return
 	}
-	dir := filepath.Join(home, "Documents")
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		events.add("no log file: " + err.Error())
-		return
-	}
-	f, err := os.Create(filepath.Join(dir, "playground.log"))
+	f, err := os.Create(path)
 	if err != nil {
 		events.add("no log file: " + err.Error())
 		return

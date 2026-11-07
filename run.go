@@ -59,7 +59,22 @@ var (
 )
 
 // Run runs the program; it must be called from main and never returns.
+//
+// For tests without a person at the screen (the CI workflow), two variables
+// of the environment:
+//
+//	PLAYGROUND_LOG   the event log also goes to this file; "1" picks
+//	                 Documents/playground.log in the home directory, which
+//	                 is the app's own on iOS
+//	PLAYGROUND_COPY  "sensitive" or "plain": the first frame copies what the
+//	                 buttons of the Clipboard page copy
 func Run(f Features) {
+	if v := os.Getenv("PLAYGROUND_LOG"); v != "" {
+		if v == "1" {
+			v = ""
+		}
+		openLogFile(v)
+	}
 	events.add("process started (Gio: " + f.Name + ", gogio flags: " + buildFlags + ")")
 	if !registersScheme() {
 		events.add("no URL scheme registered: started without an app bundle (go run), see the page URLs and iOS scenes")
@@ -68,7 +83,7 @@ func Run(f Features) {
 	if f.Trace != nil {
 		// The diag build is for the test that needs the quiet log.
 		quiet.Store(true)
-		openLogFile()
+		openLogFile("")
 		f.Trace(func(s string) {
 			if strings.HasPrefix(s, "raw:") {
 				events.add("gio " + s)

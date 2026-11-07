@@ -3,6 +3,7 @@ package playground
 import (
 	"fmt"
 	"image"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -47,6 +48,9 @@ type ui struct {
 	back widget.Clickable
 	list widget.List
 
+	// autoCopy is PLAYGROUND_COPY, done by the first frame (see Run).
+	autoCopy string
+
 	cfg    app.Config
 	gotCfg bool
 	view   uintptr // Android: the View of the last ViewEvent
@@ -66,7 +70,7 @@ type ui struct {
 func newUI(w *app.Window, f Features) *ui {
 	th := material.NewTheme()
 	th.Shaper = text.NewShaper(text.NoSystemFonts(), text.WithCollection(gofont.Collection()))
-	u := &ui{w: w, f: f, th: th, expl: explorer.NewExplorer(w)}
+	u := &ui{w: w, f: f, th: th, expl: explorer.NewExplorer(w), autoCopy: os.Getenv("PLAYGROUND_COPY")}
 	u.list.Axis = layout.Vertical
 	for _, p := range []page{
 		new(clipboardPage),
@@ -151,6 +155,10 @@ func (u *ui) config(c app.Config) {
 
 func (u *ui) layout(gtx layout.Context) {
 	paint.Fill(gtx.Ops, u.th.Bg)
+	if u.autoCopy != "" {
+		copyFor(u, gtx, u.autoCopy == "sensitive")
+		u.autoCopy = ""
+	}
 	if u.cur != nil {
 		// Back (Android's back gesture, Escape elsewhere) returns to the
 		// menu; on the menu it is left to the system.
