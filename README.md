@@ -188,7 +188,8 @@ not `scripts/desktop.sh`.
 ## Checks without a person (CI)
 
 `.github/workflows/ci.yml` runs on every push to main and every pull
-request, for each of `fork`, `diag` and `upstream`. Each check is a script
+request, for each of `fork`, `diag` and `upstream` (the Linux packages for
+`fork`). Each check is a script
 that also runs locally:
 
 | Check | Script | What it shows |
@@ -201,13 +202,14 @@ that also runs locally:
 | iOS simulator | `scripts/ios.sh simulator` | an unsigned simulator build (x86_64, so an Intel runner): the Info.plist lines of the log (scene manifest, MinimumOSVersion, privacy manifest), a scene, a URL |
 | X11 clipboard | `scripts/x11-clipboard-check.sh` | under Xvfb with xclip: TARGETS, the text, the hint on a sensitive copy only, and a type that is not offered: refused at once (fork, diag) or no answer (upstream) |
 | Wayland | `scripts/wayland-check.sh` | under Mutter, GNOME's compositor, headless: Wayland view, configuration, frame |
+| Linux packages | `scripts/deb.sh`, `rpm.sh`, `appimage.sh`, `flatpak.sh build`, then `scripts/linux-package-test.sh KIND` | each installed alone in a clean container (Ubuntu 24.04, Fedora 42), started under Xvfb up to a frame (see [Linux packages](#linux-packages)) |
 
 The program helps with two variables of the environment (see `Run` in
 `run.go`): `PLAYGROUND_LOG` writes the event log to a file (`1`:
 `Documents/playground.log`, the app's own on iOS), and `PLAYGROUND_COPY`
 (`sensitive` or `plain`) copies with the first frame. `scripts/check-log.sh`
 waits for the lines a check expects. The two Linux checks run themselves in
-Docker on a host that is not Linux (`indocker` in `scripts/lib.sh`).
+Docker on a host that is not Linux (`rerun_in_docker` in `scripts/lib.sh`).
 
 ## iOS setup
 

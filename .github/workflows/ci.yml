@@ -225,3 +225,34 @@ jobs:
           name: ios-simulator-${{ matrix.gio }}
           path: build/*.log
           if-no-files-found: ignore
+
+  linux-packages:
+    name: Linux package (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [deb, rpm, appimage, flatpak]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Each script builds in Docker what the package needs (the program
+      # first, scripts/linux.sh); the test installs only the package in a
+      # clean container, so its declared dependencies have to be enough.
+      - name: Build the package
+        run: |
+          case ${{ matrix.package }} in
+          flatpak) scripts/flatpak.sh build ;;
+          *) scripts/${{ matrix.package }}.sh ;;
+          esac
+      - name: Install and run it in a clean container
+        run: scripts/linux-package-test.sh ${{ matrix.package }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-${{ matrix.package }}
+          path: |
+            build/*.deb
+            build/*.rpm
+            build/*.AppImage
+            build/*.flatpak
+          if-no-files-found: error

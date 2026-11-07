@@ -12,13 +12,13 @@
 # the refusal.
 #
 # Linux with Xvfb, xclip and Gio's build packages runs it directly (the CI
-# runner). Elsewhere it runs itself in Docker (indocker in lib.sh).
+# runner). Elsewhere it runs itself in Docker (rerun_in_docker in lib.sh).
 set -euo pipefail
 
 . "$(dirname "$0")/lib.sh"
 
 if [ "$(uname -s)" != Linux ] || [ "${IN_DOCKER:-}" = 1 ]; then
-	indocker x11-clipboard-check.sh
+	rerun_in_docker x11-clipboard-check.sh
 fi
 
 bin=$root/build/x11-$GIO

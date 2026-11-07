@@ -72,11 +72,11 @@ ldflags() {
 	echo "-X $p.buildFlags=$1 -X $p.urlScheme=$URL_SCHEME"
 }
 
-# indocker runs scripts/$1 in a Debian container with Go, Gio's build
+# rerun_in_docker runs scripts/$1 in a Debian container with Go, Gio's build
 # packages and the tools of the Linux checks (Xvfb, xclip, Mutter), for a
 # host that is not Linux. The image gioplayground-linux-check is built on
 # the first run; the Go caches stay in volumes.
-indocker() {
+rerun_in_docker() {
 	local image=gioplayground-linux-check gover
 	if ! docker image inspect "$image" >/dev/null 2>&1; then
 		gover=$(sed -n 's/^go //p' "$root/go.mod")
