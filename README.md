@@ -43,8 +43,10 @@ Where the patches are:
   `app.Events`, and upstream merged `app.BackgroundEvent` and
   `app.ForegroundEvent` (ff63fbb7, 2026-11-01). DecorationColors, which Elias
   turned down in favour of no decorations of Gio's own, and Editor.Wipe and the
-  X11 clipboard refusal (not sent yet) stay in the fork. The fork's branch
-  pwdmgr-background-event is upstream plus these three.
+  X11 clipboard refusal (sent as
+  [gio-patches 72360](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72360))
+  stay in the fork. The fork's branch pwdmgr-2919cda5 is upstream main
+  (2919cda5, 2026-11-06) plus these three.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
   The two Android patches are upstream (`ad1ee9c`, `77d3e1d`); `explorer.SaveFilePath`

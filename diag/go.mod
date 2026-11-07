@@ -3,7 +3,7 @@ module github.com/gesellix/gio-playground/diag
 go 1.27.3
 
 require (
-	gioui.org v0.10.4-0.20261101180047-ff63fbb7efb8
+	gioui.org v0.10.4-0.20261107133850-2919cda56e42
 	gioui.org/x v0.10.3
 	github.com/gesellix/gio-playground v0.0.0
 )
@@ -16,10 +16,10 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.4 // indirect
-	golang.org/x/exp/shiny v0.0.0-20261014143641-f0251eb4aa3e // indirect
+	golang.org/x/exp/shiny v0.0.0-20261106192419-47ce03d25ef0 // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
@@ -28,13 +28,14 @@ require (
 
 replace github.com/gesellix/gio-playground => ../
 
-// gioui.org: upstream main ff63fbb7 (2026-11-01), which has iOS 13, the UIScene
+// gioui.org: upstream main 2919cda5 (2026-11-06), which has iOS 13, the UIScene
 // life cycle, clipboard Sensitive, the macOS/iOS wakeup on the main queue and
 // app.BackgroundEvent and ForegroundEvent, plus DecorationColors (dropped from
-// the series), Editor.Wipe and the X11 clipboard refusal, the fork's branch
-// pwdmgr-background-event (github.com/gesellix/gio-forked), with the branch
-// diag-background-state on top of it: test only, never sent upstream.
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261101183802-d928d9802cf5
+// the series), Editor.Wipe and the X11 clipboard refusal (gio-patches 72360),
+// the fork's branch pwdmgr-2919cda5 (github.com/gesellix/gio-forked), with the
+// branch diag-background-state-2919cda5 on top of it: test only, never sent
+// upstream.
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261107173524-7a0c0441ce1d
 
 // gioui.org/x upstream main, which has our two Android patches, plus
 // explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).
