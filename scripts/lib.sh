@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared by the scripts (sourced, not run): loads .env and picks the build.
 #
 # Variables from the environment win over .env, so a single run can change
@@ -69,4 +70,27 @@ platformdir() {
 ldflags() {
 	local p=github.com/gesellix/gio-playground
 	echo "-X $p.buildFlags=$1 -X $p.urlScheme=$URL_SCHEME"
+}
+
+# indocker runs scripts/$1 in a Debian container with Go, Gio's build
+# packages and the tools of the Linux checks (Xvfb, xclip, Mutter), for a
+# host that is not Linux. The image gioplayground-linux-check is built on
+# the first run; the Go caches stay in volumes.
+indocker() {
+	local image=gioplayground-linux-check gover
+	if ! docker image inspect "$image" >/dev/null 2>&1; then
+		gover=$(sed -n 's/^go //p' "$root/go.mod")
+		docker build -q -t "$image" - >/dev/null <<-EOF
+			FROM golang:$gover-bookworm
+			RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \\
+				pkg-config libwayland-dev libx11-dev libx11-xcb-dev libxkbcommon-x11-dev \\
+				libgles2-mesa-dev libegl1-mesa-dev libffi-dev libxcursor-dev libvulkan-dev \\
+				libgl1-mesa-dri xvfb xauth xclip mutter dbus >/dev/null \\
+				&& rm -rf /var/lib/apt/lists/*
+		EOF
+	fi
+	exec docker run --rm -e GIO -e IN_DOCKER=0 -v "$root:/src" -w /src \
+		-v gioplayground-linux-check-gomod:/go/pkg/mod \
+		-v gioplayground-linux-check-gocache:/root/.cache/go-build \
+		"$image" "scripts/$1"
 }

@@ -95,7 +95,9 @@ build's image and volumes with `docker rmi gioplayground-flatpak` and
   For Windows, `scripts/windows.sh` first makes `rsrc_windows_<arch>.syso`
   from `winres.json` with go-winres (a tool of the `fork` and `diag`
   modules).
-- `scripts/` builds, installs and starts the app.
+- `scripts/` builds, installs and starts the app, and holds the checks
+  (see [Checks without a person](#checks-without-a-person-ci)).
+- `.github/workflows/ci.yml` runs the checks.
 
 ## Setup
 
@@ -143,6 +145,30 @@ same app id, so installing one replaces the other.
 URLs need an app that registers the scheme: on the desktop that is only
 the macOS bundle of `scripts/macos.sh` (`open gioplayground://hello`),
 not `scripts/desktop.sh`.
+
+## Checks without a person (CI)
+
+`.github/workflows/ci.yml` runs on every push to main and every pull
+request, for each of `fork`, `diag` and `upstream`. Each check is a script
+that also runs locally:
+
+| Check | Script | What it shows |
+|---|---|---|
+| Format, vet, tests, tidy, shellcheck, actionlint | (in the workflow) | |
+| The platform files in the package | `scripts/check-build.sh FILE GIO` | `.apk`, `.exe`, macOS and iOS `.app`: version 2.0.0, `PlaygroundPlatformFile`, backup, second activity, privacy manifest, MinimumOSVersion (fork and diag) or gogio's own (upstream) |
+| Android in the emulator | `scripts/android.sh smoke` | start up to a frame, a URL, the backup flag (`dumpsys package`) |
+| Windows | `scripts/windows.sh smoke` (on Windows, Git Bash) | start up to a frame, a URL that a second process hands to the window |
+| macOS | `scripts/macos.sh smoke` | the bundle, start up to a frame, a URL |
+| iOS simulator | `scripts/ios.sh simulator` | an unsigned simulator build (x86_64, so an Intel runner): the Info.plist lines of the log (scene manifest, MinimumOSVersion, privacy manifest), a scene, a URL |
+| X11 clipboard | `scripts/x11-clipboard-check.sh` | under Xvfb with xclip: TARGETS, the text, the hint on a sensitive copy only, and a type that is not offered: refused at once (fork, diag) or no answer (upstream) |
+| Wayland | `scripts/wayland-check.sh` | under Mutter, GNOME's compositor, headless: Wayland view, configuration, frame |
+
+The program helps with two variables of the environment (see `Run` in
+`run.go`): `PLAYGROUND_LOG` writes the event log to a file (`1`:
+`Documents/playground.log`, the app's own on iOS), and `PLAYGROUND_COPY`
+(`sensitive` or `plain`) copies with the first frame. `scripts/check-log.sh`
+waits for the lines a check expects. The two Linux checks run themselves in
+Docker on a host that is not Linux (`indocker` in `scripts/lib.sh`).
 
 ## iOS setup
 

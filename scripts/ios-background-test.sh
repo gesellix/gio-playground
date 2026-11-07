@@ -17,7 +17,7 @@ mkdir -p "$out"
 safari=com.apple.mobilesafari
 
 launch() { xcrun devicectl device process launch --device "$IOS_DEVICE" "$@" >>"$out/devicectl.log" 2>&1; }
-open_app() { launch "$APP_ID"; sleep "${1:-3}"; }
+open_app() { launch "$APP_ID"; sleep 3; }
 open_url() { launch --payload-url "$URL_SCHEME://$1" "$APP_ID"; sleep "${2:-3}"; }
 restart() { launch --terminate-existing "$@" "$APP_ID"; sleep 3; }
 leave() { launch "$safari"; sleep "${1:-3}"; }

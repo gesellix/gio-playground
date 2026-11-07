@@ -1,0 +1,227 @@
+# Builds and runs the playground on every platform it has, for the three
+# builds (GIO: fork, diag, upstream), and checks what the patches change
+# without a person at the screen: the platform files in the packages, the
+# start up to a drawn frame, URLs, the backup flag on Android, the X11
+# clipboard and Wayland under GNOME's compositor. Each check is a script in
+# scripts/ that also runs locally; the jobs only prepare the machine and
+# call it.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Format, vet, tests, tidy, shellcheck, actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      - name: Install Gio's build packages
+        run: scripts/apt-gio.sh
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          [ -z "$unformatted" ] || { echo "not formatted: $unformatted"; exit 1; }
+      - name: go vet, go mod tidy -diff (every module), go test
+        run: |
+          for m in . fork diag upstream; do
+            echo "== $m"
+            (cd "$m" && go vet ./... && go mod tidy -diff)
+          done
+          go test ./...
+      - name: shellcheck
+        run: docker run --rm -v "$PWD:/w" -w /w koalaman/shellcheck:v0.10.0 -x -S warning scripts/*.sh flatpak/*.sh
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/w" -w /w rhysd/actionlint:1.7.12 -color
+
+  linux:
+    name: Linux X11 and Wayland (${{ matrix.gio }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      - name: Install Gio's build packages, Xvfb, xclip and Mutter
+        run: scripts/apt-gio.sh xvfb xauth xclip libgl1-mesa-dri mutter dbus
+      - name: X11 clipboard under Xvfb
+        run: scripts/x11-clipboard-check.sh
+      - name: Wayland under headless Mutter (GNOME's compositor)
+        if: always()
+        run: scripts/wayland-check.sh
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: linux-${{ matrix.gio }}
+          path: build/*.log
+          if-no-files-found: ignore
+
+  android:
+    name: Android (${{ matrix.gio }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+      # The emulator's ABI.
+      ANDROID_ARCH: amd64
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      # The runner has the Android SDK with an NDK and a JDK; without
+      # ANDROID_SIGNKEY gogio signs with a debug key.
+      - name: Build the APK
+        run: scripts/android.sh build
+      - name: Check the APK
+        run: scripts/check-build.sh "build/GioPlayground-$GIO.apk" "$GIO"
+      # The emulator needs KVM, which the runner user cannot open by
+      # default (see the android-emulator-runner README).
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run it in the emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          disk-size: 2048M
+          ram-size: 3072M
+          emulator-boot-timeout: 300
+          script: scripts/android.sh smoke
+
+  windows-build:
+    name: Windows build (${{ matrix.gio }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      # gogio cross-compiles; go-winres makes the resources of fork and diag.
+      - name: Build the .exe
+        run: scripts/windows.sh build
+      - name: Check the .exe
+        run: scripts/check-build.sh "build/GioPlayground-$GIO.exe" "$GIO"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-${{ matrix.gio }}
+          path: build/GioPlayground-${{ matrix.gio }}.exe
+          if-no-files-found: error
+
+  windows-run:
+    name: Windows run (${{ matrix.gio }})
+    needs: windows-build
+    runs-on: windows-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: windows-${{ matrix.gio }}
+          path: build
+      - run: scripts/windows.sh smoke
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: windows-run-${{ matrix.gio }}
+          path: build/*.log
+          if-no-files-found: ignore
+
+  macos:
+    name: macOS (${{ matrix.gio }})
+    runs-on: macos-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      - run: scripts/macos.sh smoke
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: macos-${{ matrix.gio }}
+          path: build/*.log
+          if-no-files-found: ignore
+
+  ios-simulator:
+    name: iOS simulator (${{ matrix.gio }})
+    # gogio builds the simulator app for x86_64 only, so an Intel runner.
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        gio: [fork, diag, upstream]
+    env:
+      GIO: ${{ matrix.gio }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      - run: scripts/ios.sh simulator
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ios-simulator-${{ matrix.gio }}
+          path: build/*.log
+          if-no-files-found: ignore

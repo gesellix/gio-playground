@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Builds the Windows program (on any system, gogio cross-compiles):
 #
-#   scripts/windows.sh [build]
+#   scripts/windows.sh [build|smoke]
 #
 # Copy build/<APP_NAME>-<GIO>.exe to a Windows computer and run it there.
 # Its properties (Details tab) show the version information. WINDOWS_ARCH
-# picks the architecture (amd64 by default, or arm64).
+# picks the architecture (amd64 by default, or arm64). smoke runs on
+# Windows (Git Bash, the CI runner): it starts that .exe with
+# PLAYGROUND_LOG, opens a URL, which a second process hands to the
+# running window, and checks the log (scripts/check-log.sh).
 . "$(dirname "$0")/lib.sh"
 
 arch=${WINDOWS_ARCH:-amd64}
@@ -32,10 +35,27 @@ build() {
 	echo "built $exe"
 }
 
+smoke() {
+	local log=$root/build/$APP_NAME-$GIO-smoke.log
+	rm -f "$log"
+	# A Windows path for the program, which knows nothing of Git Bash's.
+	local winlog=$log
+	command -v cygpath >/dev/null && winlog=$(cygpath -w "$log")
+	PLAYGROUND_LOG=$winlog "$exe" &
+	local pid=$! ok=0
+	"$root/scripts/check-log.sh" "$log" "$GIO" "window event loop started" &&
+		powershell -NoProfile -Command "Start-Process '$URL_SCHEME://hello'" &&
+		"$root/scripts/check-log.sh" "$log" "$GIO" "URLEvent $URL_SCHEME://hello" || ok=$?
+	kill "$pid" 2>/dev/null || true
+	taskkill //F //IM "$(basename "$exe")" >/dev/null 2>&1 || true
+	return $ok
+}
+
 case ${1:-build} in
 build) build ;;
+smoke) smoke ;;
 *)
-	sed -n '2,8p' "$0" >&2
+	sed -n '2,11p' "$0" >&2
 	exit 2
 	;;
 esac
