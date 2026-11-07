@@ -157,8 +157,15 @@ sys.exit("no available iPhone simulator")')
 		"bundle has PrivacyInfo.xcprivacy: $privacy" \
 		"UIScene: "
 	xcrun simctl openurl "$sim" "$URL_SCHEME://hello"
-	"$root/scripts/check-log.sh" "$log" "$GIO" "URLEvent $URL_SCHEME://hello"
+	local ok=0
+	"$root/scripts/check-log.sh" "$log" "$GIO" "URLEvent $URL_SCHEME://hello" || ok=$?
 	cp "$log" "$root/build/$APP_NAME-$GIO-simulator.log"
+	if [ $ok != 0 ]; then
+		# What the screen showed instead, for example a question of iOS
+		# before it opens the URL.
+		xcrun simctl io "$sim" screenshot "$root/build/$APP_NAME-$GIO-simulator.png" || true
+		return $ok
+	fi
 }
 
 start() {

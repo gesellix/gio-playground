@@ -247,7 +247,9 @@ jobs:
         if: always()
         with:
           name: ios-simulator-${{ matrix.gio }}
-          path: build/*.log
+          path: |
+            build/*.log
+            build/*.png
           if-no-files-found: ignore
 
   linux-packages:
