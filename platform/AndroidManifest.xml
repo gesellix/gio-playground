@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The complete AndroidManifest.xml for GIO=platformdir: gogio -platformdir
+<!-- The complete AndroidManifest.xml for GIO=fork and diag: gogio -platformdir
      uses it as it is, instead of generating one. The scripts replace @APP_ID@,
      @APP_NAME@ and @URL_SCHEME@ and write the result to
      build/platform/. Started from gogio's own output; it differs in

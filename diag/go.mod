@@ -13,9 +13,16 @@ require (
 	gioui.org/shader v1.0.9 // indirect
 	git.wow.st/gmp/jni v0.0.0-20260821030830-2b2c1e0034f1 // indirect
 	github.com/akavel/rsrc v0.10.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.4 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/tc-hib/go-winres v0.3.3 // indirect
+	github.com/tc-hib/winres v0.3.1 // indirect
+	github.com/urfave/cli/v2 v2.27.7 // indirect
+	github.com/xrash/smetrics v0.0.0-20261013231157-39c47d93efba // indirect
 	golang.org/x/exp/shiny v0.0.0-20261106192419-47ce03d25ef0 // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
@@ -41,10 +48,11 @@ replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261107173524-7a0
 // explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).
 replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261102213852-91215c32f22b
 
-// gioui.org/cmd (gogio, run as 'go tool gogio') upstream c57ee40, which has
-// the scene manifest with iOS 13 as the default -minsdk, plus -plist,
-// -privacymanifest and -manifest (gio-patches 72106), the fork's branch
-// pwdmgr (github.com/gesellix/gio-cmd).
-replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261026075116-f147ae0fe09d
+// gioui.org/cmd (gogio) upstream c57ee40 plus the -platformdir prototype,
+// the fork's branch platform-dir-v4 (github.com/gesellix/gio-cmd).
+replace gioui.org/cmd => github.com/gesellix/gio-cmd v0.0.0-20261031084054-8127c457deba
 
-tool gioui.org/cmd/gogio
+tool (
+	gioui.org/cmd/gogio
+	github.com/tc-hib/go-winres
+)

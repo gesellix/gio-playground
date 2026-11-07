@@ -1,5 +1,6 @@
 // The playground built with the forks of Gio, gio-x and gogio, which have
-// the patches (see go.mod).
+// the patches (see go.mod). The scripts pass gogio the complete platform
+// files of platform/ with -platformdir.
 package main
 
 import (

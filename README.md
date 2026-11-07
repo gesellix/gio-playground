@@ -3,8 +3,7 @@
 A small [Gio](https://gioui.org) program to try out patches to Gio, gio-x
 and gogio on real devices, and to show what they change. The same program
 is built with the patches (`fork/`) and with upstream as it is
-(`upstream/`, which by now has some of them), and a
-third time with the gogio prototype of `-platformdir` (`platformdir/`).
+(`upstream/`, which by now has some of them).
 
 Each page of the app exercises one patch. An event log that all pages
 share records what the program receives (configuration changes, URLs,
@@ -24,11 +23,11 @@ afterwards ("Event log", "Copy the log").
 | Event log                                    |                                                                  | Everything above, newest first.                                                                                                                                                                                                                                                                                                                                                           |
 
 The gogio patches show at build time: on iOS the log starts with whether
-the Info.plist has the scene manifest (gogio writes it), its
-MinimumOSVersion (13 without `-minsdk`) and whether the app has its
-privacy manifest (`-privacymanifest`); on Android `-manifest` turns
-off the app's backup (`adb shell dumpsys package <APP_ID>`: no
-`ALLOW_BACKUP` among the flags). Not covered: the js build tags fix.
+the Info.plist has the scene manifest, its MinimumOSVersion and whether
+the app has its privacy manifest. Upstream's gogio writes the scene
+manifest itself and builds for 13 without `-minsdk`; the fork's builds
+take all three from the complete platform files (see [Running](#running)).
+Not covered: the js build tags fix.
 
 Where the patches are:
 
@@ -54,12 +53,14 @@ Where the patches are:
 - gogio: [gesellix/gio-cmd](https://github.com/gesellix/gio-cmd), sent as
   [gio-patches 72106](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72106)
   (`-plist`, `-privacymanifest`, `-manifest`; turned down for complete
-  platform files, kept in the fork's branch pwdmgr). The scene manifest
-  and iOS 13 as the default `-minsdk` are upstream (c57ee40, 2026-10-25).
-  `-platformdir` (branch platform-dir-v4, not sent yet) replaces the
+  platform files, no longer used here). The scene manifest and iOS 13 as
+  the default `-minsdk` are upstream (c57ee40, 2026-10-25). `-platformdir`
+  (branch platform-dir-v4, which the fork's builds use) replaces the
   generated files with complete ones, named after their target as Elias
   suggested (Info_ios.plist, with Info.plist as the fallback), and on
-  Windows with a ready resource object (rsrc_windows_<arch>.syso).
+  Windows with a ready resource object (rsrc_windows_<arch>.syso). It was
+  sent with the lookup in the main package as the default and the flag
+  optional (branch platform-dir-v5).
 
 ## Flatpak test
 
@@ -84,17 +85,16 @@ build's image and volumes with `docker rmi gioplayground-flatpak` and
   upstream Gio and gio-x, so it cannot use an API of the patches by
   accident; the fork passes those APIs in as `playground.Features`.
 - `fork/` and `upstream/` are the two programs, each a module of its own
-  with its versions of Gio, gio-x and gogio (`go tool gogio`).
-- `ios/` and `android/` hold the files for gogio's `-privacymanifest`
-  and `-manifest`.
-- `platformdir/` is a third program, the fork's with the gogio of
-  `-platformdir`, and `platform/` holds its complete platform files as
-  templates (`AndroidManifest.xml`, `Info_ios.plist`,
+  with its versions of Gio, gio-x and gogio (`go tool gogio`). `diag/` is
+  the fork's program with a trace of the iOS driver.
+- `platform/` holds the complete platform files of the fork's builds
+  (`fork/` and `diag/`) as templates (`AndroidManifest.xml`, `Info_ios.plist`,
   `PrivacyInfo_ios.xcprivacy`, `Info_macos.plist`, `winres.json`): the
   scripts fill in `APP_ID`, `APP_NAME` and `URL_SCHEME` and write them to
   `build/platform/`, where gogio picks the files of its target by name.
   For Windows, `scripts/windows.sh` first makes `rsrc_windows_<arch>.syso`
-  from `winres.json` with go-winres (a tool of the `platformdir` module).
+  from `winres.json` with go-winres (a tool of the `fork` and `diag`
+  modules).
 - `scripts/` builds, installs and starts the app.
 
 ## Setup
@@ -118,13 +118,13 @@ scripts/ios.sh                     # build, install, start
 scripts/windows.sh                 # build the .exe (copy it to Windows)
 scripts/flatpak.sh                 # Linux: build and install as a Flatpak, then run it
 GIO=upstream scripts/android.sh    # the same with upstream as it is
-GIO=platformdir scripts/ios.sh     # with complete platform files
 GIO=diag scripts/ios.sh            # a trace of the iOS driver, driven by URLs
 scripts/ios-background-test.sh     # runs the background tests with that build
 ```
 
-With `GIO=platformdir` gogio gets `-platformdir` instead of `-schemes`,
-`-manifest`, `-plist`, `-privacymanifest` and `-minsdk`; the files in
+With `GIO=fork` (the default) and `GIO=diag` gogio gets `-platformdir`
+instead of `-schemes` and `-minsdk` (on Windows it keeps `-schemes`, as
+Gio registers the scheme at run time); the files in
 `platform/` set the version (2.0.0, 7), the URL scheme and the minimum
 version. To see that they are used as they are: on iOS the event log
 shows the `CFBundleExecutable` (`<APP_NAME>Exe`), the version and the key

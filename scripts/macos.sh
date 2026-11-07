@@ -20,7 +20,7 @@ build() {
 	esac
 	rm -rf "$app"
 	local flags=(-target macos -arch "$arch" -appid "$APP_ID" -name "$APP_NAME")
-	if [ "$GIO" = platformdir ]; then
+	if completefiles; then
 		# The complete Info.plist sets the version, the scheme and the
 		# name of the executable.
 		flags+=(-platformdir "$(platformdir)")

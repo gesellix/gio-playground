@@ -13,7 +13,7 @@ exe=$root/build/$APP_NAME-$GIO.exe
 
 build() {
 	local flags=(-target windows -arch "$arch" -appid "$APP_ID" -name "$APP_NAME")
-	if [ "$GIO" = platformdir ]; then
+	if completefiles; then
 		# The complete file on Windows is a resource object with the
 		# application manifest and the version information. Any tool can
 		# make it; here go-winres builds rsrc_windows_<arch>.syso from

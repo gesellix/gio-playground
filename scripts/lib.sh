@@ -29,23 +29,25 @@ fi
 : "${URL_SCHEME:=gioplayground}"
 
 case $GIO in
-fork | upstream | platformdir | diag) ;;
+fork | upstream | diag) ;;
 *)
-	echo "GIO is fork, upstream, platformdir or diag, not $GIO" >&2
+	echo "GIO is fork, upstream or diag, not $GIO" >&2
 	exit 2
 	;;
 esac
 
-# The module of the build: fork (with the patches), upstream, platformdir
-# (the fork's Gio, with the gogio of -platformdir), or diag (the fork's Gio
-# with a trace of the iOS driver, see scripts/ios-background-test.sh).
+# The module of the build: fork (with the patches), upstream, or diag (the
+# fork with a trace of the iOS driver, see scripts/ios-background-test.sh).
 moddir=$root/$GIO
 mkdir -p "$root/build"
 
 # gogio runs as a tool of the module, so each build gets its own gogio:
-# the fork's with -plist, -manifest and -privacymanifest, upstream's, or
-# the one with -platformdir.
+# upstream's, or for fork and diag the fork's with -platformdir.
 gogio() { (cd "$moddir" && go tool gogio "$@"); }
+
+# completefiles reports whether the build passes gogio the complete platform
+# files of platform/ (fork and diag) instead of letting it generate them.
+completefiles() { [ "$GIO" != upstream ]; }
 
 # platformdir writes the complete platform files of platform/ to
 # build/platform/, with the values of .env, and prints the directory to

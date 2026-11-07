@@ -76,9 +76,10 @@ build() {
 	local flags=(-target ios -appid "$APP_ID" -name "$APP_NAME" -signkey "$key")
 	local used
 	local minsdk=${IOS_MINSDK:-}
-	if [ "$GIO" = platformdir ]; then
+	if completefiles; then
 		# The complete Info.plist sets the version, the scheme and
-		# MinimumOSVersion; -appid only has to match it.
+		# MinimumOSVersion, and the privacy manifest comes along; -appid
+		# only has to match it.
 		flags+=(-platformdir "$(platformdir)")
 		gogio "${flags[@]}" -ldflags "$(ldflags platformdir)" -o "$ipa" .
 		echo "built $ipa"
@@ -88,10 +89,6 @@ build() {
 	used=schemes
 	# gogio writes the scene manifest itself, and without -minsdk it
 	# builds for iOS 13 (upstream since c57ee40).
-	if [ "$GIO" = fork ] || [ "$GIO" = diag ]; then
-		flags+=(-privacymanifest "$root/ios/PrivacyInfo.xcprivacy")
-		used+=,privacymanifest
-	fi
 	if [ -n "$minsdk" ]; then
 		flags+=(-minsdk "$minsdk")
 		used+=,minsdk
