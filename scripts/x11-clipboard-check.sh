@@ -4,12 +4,9 @@
 #
 #   GIO=fork scripts/x11-clipboard-check.sh
 #
-# The fork's Gio refuses a request for a type it does not offer at once, as
-# ICCCM 2.2 asks (the X11 clipboard refusal, gio-patches 72360); upstream
-# sends no answer, so xclip waits until its timeout. Both offer
-# x-kde-passwordManagerHint ("secret") for a sensitive copy only. A check of
-# upstream that fails means that upstream changed: see whether it applied
-# the refusal.
+# Gio refuses a request for a type it does not offer at once, as ICCCM 2.2
+# asks (the X11 clipboard refusal, upstream since 327752e9). It offers
+# x-kde-passwordManagerHint ("secret") for a sensitive copy only.
 #
 # Linux with Xvfb, xclip and Gio's build packages runs it directly (the CI
 # runner). Elsewhere it runs itself in Docker (rerun_in_docker in lib.sh).
@@ -51,7 +48,6 @@ get() {
 	secs=$(awk -v a="$start" -v b="$end" 'BEGIN { printf "%.1f", (b - a) / 1e9 }')
 }
 refused() { [ "$rc" = 1 ] && [[ $out == *"not available"* ]] && echo yes || echo no; }
-silent() { [ "$rc" = 124 ] && echo yes || echo no; }
 
 for mode in sensitive plain; do
 	log=$root/build/x11-$GIO-$mode.log
@@ -92,11 +88,7 @@ for mode in sensitive plain; do
 	[ $mode = plain ] && unoffered+=(x-kde-passwordManagerHint)
 	for t in "${unoffered[@]}"; do
 		get "$t"
-		if [ "$GIO" != upstream ]; then # the fork's Gio: fork and diag
-			check "$t refused at once" "$(refused)" "rc=$rc after ${secs}s: $out"
-		else
-			check "$t gets no answer (upstream, before the refusal)" "$(silent)" "rc=$rc after ${secs}s"
-		fi
+		check "$t refused at once" "$(refused)" "rc=$rc after ${secs}s: $out"
 	done
 	kill "$pid" 2>/dev/null || true
 	wait "$pid" 2>/dev/null || true

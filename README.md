@@ -200,7 +200,7 @@ that also runs locally:
 | Windows | `scripts/windows.sh smoke` (on Windows, Git Bash) | start up to a frame, a URL that a second process hands to the window |
 | macOS | `scripts/macos.sh smoke` | the bundle, start up to a frame, a URL |
 | iOS simulator | `scripts/ios.sh simulator` | an unsigned simulator build (x86_64, so an Intel runner): the Info.plist lines of the log (scene manifest, MinimumOSVersion, privacy manifest), the scene connecting; no URL, as iOS asks before it opens one from `simctl openurl` |
-| X11 clipboard | `scripts/x11-clipboard-check.sh` | under Xvfb with xclip: TARGETS, the text, the hint on a sensitive copy only, and a type that is not offered: refused at once (fork, diag) or no answer (upstream) |
+| X11 clipboard | `scripts/x11-clipboard-check.sh` | under Xvfb with xclip: TARGETS, the text, the hint on a sensitive copy only, and a type that is not offered: refused at once |
 | Wayland | `scripts/wayland-check.sh` | under Mutter, GNOME's compositor, headless: Wayland view, configuration, frame |
 | Linux packages | `scripts/deb.sh`, `rpm.sh`, `appimage.sh`, `flatpak.sh build`, then `scripts/linux-package-test.sh KIND` | each installed alone in a clean container (Ubuntu 24.04, Fedora 42), started under Xvfb up to a frame (see [Linux packages](#linux-packages)) |
 
