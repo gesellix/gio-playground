@@ -5,7 +5,7 @@ go 1.27.3
 // Upstream Gio, gio-x and gogio, without the patches upstream does not
 // have yet.
 require (
-	gioui.org v0.10.4-0.20261107133850-2919cda56e42
+	gioui.org v0.10.4-0.20261109081438-327752e960e3
 	github.com/gesellix/gio-playground v0.0.0
 )
 

@@ -3,7 +3,7 @@ module github.com/gesellix/gio-playground/diag
 go 1.27.3
 
 require (
-	gioui.org v0.10.4-0.20261107133850-2919cda56e42
+	gioui.org v0.10.4-0.20261109081438-327752e960e3
 	gioui.org/x v0.10.3
 	github.com/gesellix/gio-playground v0.0.0
 )
@@ -35,14 +35,14 @@ require (
 
 replace github.com/gesellix/gio-playground => ../
 
-// gioui.org: upstream main 2919cda5 (2026-11-06), which has iOS 13, the UIScene
+// gioui.org: upstream main 327752e9 (2026-11-09), which has iOS 13, the UIScene
 // life cycle, clipboard Sensitive, the macOS/iOS wakeup on the main queue and
-// app.BackgroundEvent and ForegroundEvent, plus DecorationColors (dropped from
-// the series), Editor.Wipe and the X11 clipboard refusal (gio-patches 72360),
-// the fork's branch pwdmgr-2919cda5 (github.com/gesellix/gio-forked), with the
-// branch diag-background-state-2919cda5 on top of it: test only, never sent
+// app.BackgroundEvent and ForegroundEvent and the X11 clipboard refusal
+// (gio-patches 72360), plus DecorationColors (dropped from the series) and
+// Editor.Wipe, the fork's branch pwdmgr-327752e9 (github.com/gesellix/gio-forked), with the
+// branch diag-background-state-327752e9 on top of it: test only, never sent
 // upstream.
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261107173524-7a0c0441ce1d
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261109092624-dfac3f8748b9
 
 // gioui.org/x upstream main, which has our two Android patches, plus
 // explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).

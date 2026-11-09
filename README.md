@@ -40,12 +40,12 @@ Where the patches are:
   that posts the macOS/iOS wakeup to the main queue (24f37972, 2026-11-01). Config.Hidden
   (v2 2/4) is not applied: Elias preferred to report the background through
   `app.Events`, and upstream merged `app.BackgroundEvent` and
-  `app.ForegroundEvent` (ff63fbb7, 2026-11-01). DecorationColors, which Elias
-  turned down in favour of no decorations of Gio's own, and Editor.Wipe and the
-  X11 clipboard refusal (sent as
-  [gio-patches 72360](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72360))
-  stay in the fork. The fork's branch pwdmgr-2919cda5 is upstream main
-  (2919cda5, 2026-11-06) plus these three.
+  `app.ForegroundEvent` (ff63fbb7, 2026-11-01). The X11 clipboard
+  refusal ([gio-patches 72360](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72360))
+  is upstream too (327752e9, 2026-11-09). DecorationColors, which Elias
+  turned down in favour of no decorations of Gio's own, and Editor.Wipe
+  stay in the fork. The fork's branch pwdmgr-327752e9 is upstream main
+  (327752e9, 2026-11-09) plus these two.
 - gio-x: [gesellix/gio-x](https://github.com/gesellix/gio-x), sent as
   [gio-patches 72104](https://lists.sr.ht/~eliasnaur/gio-patches/patches/72104).
   The two Android patches are upstream (`ad1ee9c`, `77d3e1d`); `explorer.SaveFilePath`
