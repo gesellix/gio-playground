@@ -17,8 +17,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.7 h1:zbFlGlXEAKlwXpmvle3d8Oe3YnkKIK4xSRTd3
 github.com/cpuguy83/go-md2man/v2 v2.0.7/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
 github.com/gesellix/gio-cmd v0.0.0-20261031084054-8127c457deba h1:+aqjjG6VSvtX8Kr/VzW2o7t14EO5ry1LOeTAh5RfaHk=
 github.com/gesellix/gio-cmd v0.0.0-20261031084054-8127c457deba/go.mod h1:k+swG87oGEdqK3z44kS1ewXe0RYcNFBWVyz7U0jBPQw=
-github.com/gesellix/gio-forked v0.10.4-0.20261109092624-dfac3f8748b9 h1:oKVXT6IyIWW8RXnpqlr4jcujDWnpRRUXCsmbkTvDlfM=
-github.com/gesellix/gio-forked v0.10.4-0.20261109092624-dfac3f8748b9/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
+github.com/gesellix/gio-forked v0.10.4-0.20261113205059-21f2b8531512 h1:Wtx6ZXQ3RD0eC+MXJ6TaB5XQsx3Z07Qq6URVgWUxAHo=
+github.com/gesellix/gio-forked v0.10.4-0.20261113205059-21f2b8531512/go.mod h1:x8MAOooc/v4UUaB5o6BS/FpYdxnzh3LBvZlTBmYpnlQ=
 github.com/gesellix/gio-x v0.0.0-20261102213852-91215c32f22b h1:2tfedregzcnPTHgbKG2EErNefCIy8C6GlAAy2GSxUDU=
 github.com/gesellix/gio-x v0.0.0-20261102213852-91215c32f22b/go.mod h1:zAKc92Mp1xlficmcPkUFOcREY01zMiqLmO4qhiJEEO4=
 github.com/go-json-experiment/json v0.0.0-20250417205406-170dfdcf87d1 h1:+VexzzkMLb1tnvpuQdGT/DicIRW7MN8ozsXqBMgp0Hk=
