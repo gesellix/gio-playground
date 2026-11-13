@@ -40,7 +40,7 @@ replace github.com/gesellix/gio-playground => ../
 // app.BackgroundEvent and ForegroundEvent and the X11 clipboard refusal
 // (gio-patches 72360), plus DecorationColors (dropped from the series) and
 // Editor.Wipe, the fork's branch pwdmgr-8ec3c4f2 (github.com/gesellix/gio-forked).
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261113205059-94d344c9b29d
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261113213340-762fa440d1d7
 
 // gioui.org/x upstream main, which has our two Android patches, plus
 // explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).

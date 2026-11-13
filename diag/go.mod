@@ -42,7 +42,7 @@ replace github.com/gesellix/gio-playground => ../
 // Editor.Wipe, the fork's branch pwdmgr-8ec3c4f2 (github.com/gesellix/gio-forked), with the
 // branch diag-background-state-8ec3c4f2 on top of it: test only, never sent
 // upstream.
-replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261113205059-21f2b8531512
+replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261113213340-5996d782c5b0
 
 // gioui.org/x upstream main, which has our two Android patches, plus
 // explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).
