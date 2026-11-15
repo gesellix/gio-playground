@@ -1,6 +1,6 @@
 module github.com/gesellix/gio-playground/diag
 
-go 1.27.3
+go 1.27.4
 
 require (
 	gioui.org v0.10.4-0.20261112060532-8ec3c4f28118
@@ -23,13 +23,13 @@ require (
 	github.com/tc-hib/winres v0.3.1 // indirect
 	github.com/urfave/cli/v2 v2.27.7 // indirect
 	github.com/xrash/smetrics v0.0.0-20261013231157-39c47d93efba // indirect
-	golang.org/x/exp/shiny v0.0.0-20261106192419-47ce03d25ef0 // indirect
-	golang.org/x/image v0.47.0 // indirect
-	golang.org/x/mod v0.42.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20261113113407-e3970619a1a4 // indirect
+	golang.org/x/image v0.48.0 // indirect
+	golang.org/x/mod v0.43.0 // indirect
 	golang.org/x/net v0.62.0 // indirect
-	golang.org/x/sync v0.24.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/sync v0.25.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 )
 

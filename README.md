@@ -139,7 +139,7 @@ are pinned releases, checked by sha256.
 
 ## Setup
 
-- Go 1.27.3 or later (the go line of the go.mod files).
+- Go 1.27.4 or later (the go line of the go.mod files).
 - Android: the Android SDK with the NDK (`ANDROID_HOME`) and `adb`.
 - iOS: a Mac with Xcode and an Apple account (see [iOS setup](#ios-setup)).
 

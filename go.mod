@@ -1,6 +1,6 @@
 module github.com/gesellix/gio-playground
 
-go 1.27.3
+go 1.27.4
 
 // The shared code builds against upstream Gio and gio-x, so it uses no API
 // of the patches by accident. The modules fork and upstream choose the
@@ -16,9 +16,9 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.4 // indirect
-	golang.org/x/exp/shiny v0.0.0-20261106192419-47ce03d25ef0 // indirect
-	golang.org/x/image v0.47.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20261113113407-e3970619a1a4 // indirect
+	golang.org/x/image v0.48.0 // indirect
 	golang.org/x/net v0.62.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 )
