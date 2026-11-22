@@ -1,0 +1,58 @@
+# Keeps the Go modules, the Dockerfiles and the GitHub Actions up to date.
+#
+# The four Go modules (the shared code at the root and the builds fork, diag
+# and upstream) share one entry. On its own, Dependabot would still open a
+# pull request per directory; with group-by: dependency-name it opens one
+# pull request per dependency update that changes every directory using it.
+# That keeps the modules in step: the lint job checks that every module is
+# tidy, and the builds resolve the root module through a replace directive.
+#
+# Modules behind a replace directive (gioui.org, gioui.org/x, gioui.org/cmd in
+# fork and diag) are pinned to fork branches by hand. A Dependabot bump of
+# their require lines changes nothing there, the replace decides the version.
+#
+# The Go version of packaging/linux/Dockerfile comes from the go line of
+# go.mod (ARG GO_VERSION), so only its other images are Dependabot's.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directories:
+      - /
+      - /fork
+      - /diag
+      - /upstream
+    schedule:
+      interval: weekly
+    ignore:
+      # The root module, replaced by ../ in every build.
+      - dependency-name: github.com/gesellix/gio-playground
+    groups:
+      golang-x:
+        group-by: dependency-name
+        patterns:
+          - golang.org/x/*
+      gio:
+        group-by: dependency-name
+        patterns:
+          - gioui.org
+          - gioui.org/*
+      go-deps:
+        group-by: dependency-name
+        patterns:
+          - "*"
+
+  - package-ecosystem: docker
+    directories:
+      - /flatpak
+      - /packaging/linux
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
