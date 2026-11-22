@@ -92,11 +92,11 @@ scripts/appimage.sh    # build/gioplayground-2.0.0-<arch>.AppImage
 scripts/linux-package-test.sh deb    # or rpm, appimage, flatpak
 ```
 
-The program is built on Debian 12, so it runs on Ubuntu 24.04 and Fedora 42
+The program is built on Debian 12, so it runs on Ubuntu 26.04 and Fedora 45
 (it needs glibc 2.34 or later; the .deb also needs the library versions of
 Debian 12, `dpkg-shlibdeps` says which). The packages build the
 program first if `build/` does not have it. The test installs a package in a
-clean container (`ubuntu:24.04`, for rpm `fedora:42`, for flatpak `ubuntu:24.04`
+clean container (`ubuntu:26.04`, for rpm `fedora:45`, for flatpak `ubuntu:26.04`
 with `--privileged`), starts the program under Xvfb with `PLAYGROUND_LOG` and
 passes when the log has a `FrameEvent` and the program still runs after it;
 it prints what the package brought along and which graphics libraries the
@@ -202,7 +202,7 @@ that also runs locally:
 | iOS simulator | `scripts/ios.sh simulator` | an unsigned simulator build (x86_64, so an Intel runner): the Info.plist lines of the log (scene manifest, MinimumOSVersion, privacy manifest), the scene connecting; no URL, as iOS asks before it opens one from `simctl openurl` |
 | X11 clipboard | `scripts/x11-clipboard-check.sh` | under Xvfb with xclip: TARGETS, the text, the hint on a sensitive copy only, and a type that is not offered: refused at once |
 | Wayland | `scripts/wayland-check.sh` | under Mutter, GNOME's compositor, headless: Wayland view, configuration, frame |
-| Linux packages | `scripts/deb.sh`, `rpm.sh`, `appimage.sh`, `flatpak.sh build`, then `scripts/linux-package-test.sh KIND` | each installed alone in a clean container (Ubuntu 24.04, Fedora 42), started under Xvfb up to a frame (see [Linux packages](#linux-packages)) |
+| Linux packages | `scripts/deb.sh`, `rpm.sh`, `appimage.sh`, `flatpak.sh build`, then `scripts/linux-package-test.sh KIND` | each installed alone in a clean container (Ubuntu 26.04, Fedora 45), started under Xvfb up to a frame (see [Linux packages](#linux-packages)) |
 
 The program helps with two variables of the environment (see `Run` in
 `run.go`): `PLAYGROUND_LOG` writes the event log to a file (`1`:

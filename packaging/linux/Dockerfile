@@ -2,7 +2,7 @@
 # Builds the Linux program and packages it as .deb and AppImage, so that the
 # host needs only Docker: see scripts/linux.sh. Debian 12 (glibc 2.36), so that
 # the program also runs on older systems than the ones of the tests (Ubuntu
-# 24.04, Fedora 42). GO_VERSION is the go line of go.mod.
+# 26.04, Fedora 45). GO_VERSION is the go line of go.mod.
 ARG GO_VERSION
 FROM golang:${GO_VERSION}-bookworm
 # Gio's build dependencies (gioui.org/doc/install/linux), dpkg-shlibdeps for

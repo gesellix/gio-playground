@@ -4,8 +4,8 @@
 #
 #   scripts/linux-package-test.sh deb|rpm|appimage|flatpak
 #
-# deb and appimage run in ubuntu:24.04, rpm in fedora:42, flatpak in
-# ubuntu:24.04 with --privileged (bubblewrap, the sandbox of flatpak, needs
+# deb and appimage run in ubuntu:26.04, rpm in fedora:45, flatpak in
+# ubuntu:26.04 with --privileged (bubblewrap, the sandbox of flatpak, needs
 # it in a container). The package is built first if build/ does not have it
 # (scripts/deb.sh, rpm.sh, appimage.sh, flatpak.sh build).
 #
@@ -42,7 +42,7 @@ case $kind in
 deb)
 	[ -f "$deb" ] || "$root/scripts/deb.sh"
 	file=$(basename "$deb")
-	img=ubuntu:24.04
+	img=ubuntu:26.04
 	setup="$apt
 		$listpkgs >/tmp/before
 		apt-get install -y -qq /pkgs/$file >/dev/null
@@ -54,7 +54,7 @@ deb)
 rpm)
 	[ -f "$rpm" ] || "$root/scripts/rpm.sh"
 	file=$(basename "$rpm")
-	img=fedora:42
+	img=fedora:45
 	listpkgs='rpm -qa --qf "%{NAME}\n" | sort'
 	setup="$listpkgs >/tmp/before
 		dnf install -y -q /pkgs/$file >/dev/null
@@ -66,7 +66,7 @@ rpm)
 appimage)
 	[ -f "$appimage" ] || "$root/scripts/appimage.sh"
 	file=$(basename "$appimage")
-	img=ubuntu:24.04
+	img=ubuntu:26.04
 	# The libraries the program links (readelf -d, NEEDED) and libgles2.
 	libs='libegl1 libgles2 libwayland-client0 libwayland-cursor0 libwayland-egl1 libx11-6 libx11-xcb1 libxcursor1 libxfixes3 libxkbcommon0 libxkbcommon-x11-0'
 	setup="$apt
@@ -84,17 +84,18 @@ appimage)
 flatpak)
 	[ -f "$root/build/gioplayground.flatpak" ] || "$root/scripts/flatpak.sh" build
 	file=gioplayground.flatpak
-	img=ubuntu:24.04
+	img=ubuntu:26.04
 	# The app id of flatpak/, and a log in the app's own directory, which
 	# the sandbox can write.
 	app=org.example.gioplayground
 	log=/root/.var/app/$app/playground.log
 	setup="$apt
-		apt-get install -y -qq --no-install-recommends ca-certificates flatpak dbus-daemon xvfb >/dev/null
+		apt-get install -y -qq --no-install-recommends ca-certificates flatpak dbus-daemon dbus-system-bus-common xvfb >/dev/null
 		flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 		flatpak install --user -y --noninteractive --bundle /pkgs/$file >/dev/null
 		echo \"installed: \$(flatpak list --user --columns=application,branch | tr '\n' ' ')\"
-		# flatpak run asks the system bus too, which a container lacks.
+		# flatpak run asks the system bus too, which a container lacks
+		# (dbus-system-bus-common has its configuration).
 		mkdir -p /run/dbus && dbus-daemon --system --fork"
 	run="LOG=$log /tests/xvfb-test.sh dbus-run-session -- flatpak run --env=PLAYGROUND_LOG=$log $app"
 	;;
