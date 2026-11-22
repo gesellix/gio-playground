@@ -45,8 +45,8 @@ replace github.com/gesellix/gio-playground => ../
 replace gioui.org => github.com/gesellix/gio-forked v0.10.4-0.20261113213340-5996d782c5b0
 
 // gioui.org/x upstream main, which has our two Android patches, plus
-// explorer.SaveFilePath, the rest of what was sent upstream (gio-patches 72104).
-replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261102213852-91215c32f22b
+// explorer.SaveFilePath v2, the rest of what was sent upstream (gio-patches 72104).
+replace gioui.org/x => github.com/gesellix/gio-x v0.0.0-20261103125658-4dcf8a2f547d
 
 // gioui.org/cmd (gogio) upstream c57ee40 plus the -platformdir prototype,
 // the fork's branch platform-dir-v4 (github.com/gesellix/gio-cmd).
