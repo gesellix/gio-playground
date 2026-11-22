@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Packages the Linux program as an .rpm, in Docker (Fedora 42):
+# Packages the Linux program as an .rpm, in Docker (Fedora 45):
 #
 #   scripts/rpm.sh [build]
 #
@@ -11,7 +11,7 @@
 # (vulkan-loader) as Recommends.
 . "$(dirname "$0")/linux-lib.sh"
 
-rpmimage=gioplayground-rpm:fedora42
+rpmimage=gioplayground-rpm:fedora45
 
 build() {
 	needbin

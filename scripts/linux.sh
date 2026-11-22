@@ -6,7 +6,7 @@
 # The program goes to build/gioplayground-linux-<arch> (amd64 or arm64), built
 # from the module of GIO (fork by default). The image is Debian 12 with the Go
 # of the module's go line (packaging/linux/Dockerfile), so the program needs
-# glibc 2.34 or later and runs on Ubuntu 24.04 and Fedora 42. The packages of
+# glibc 2.34 or later and runs on Ubuntu 26.04 and Fedora 45. The packages of
 # deb.sh, rpm.sh and appimage.sh take this file.
 . "$(dirname "$0")/linux-lib.sh"
 
